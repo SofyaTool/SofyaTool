@@ -13,26 +13,36 @@
 You must read and accept all of the terms and conditions of this license prior
 to downloading, installing and/or using the software.
 </p>
-<p>The current version of &#931;&#959;&#966;&#943;&#945; can be downloaded here:
-<a href="http://cse.unl.edu/~galileo/ltd-tools">SIR Tools</a>
+<p>The current version of &#931;&#959;&#966;&#943;&#945; can be downloaded from the
+<a href="http://github.com/SofyaTool/SofyaForJava">SofyaForJava</a> Git repository.
 </p>
 <p>The &#931;&#959;&#966;&#943;&#945; Java analysis system is written entirely in Java,
 so it is theoretically possible to install and run the system on any architecture
-for which the Java2 SDK/JRE version 1.5 or greater is available. The system has
+for which the Java JDK/JRE version 1.5 or greater is available. The system has
 been extensively tested on Solaris (SunOS), SuSE Linux 9.1, and to a lesser extent on
-Red Hat Linux 9.0, Fedora Core 4, Gentoo 2006.0, and Windows 2000/XP.
+Red Hat Linux 9.0, Fedora Core 4, Gentoo 2006.0, and Windows 2000/XP/7/10.
 Most recently, we have had some success running &#931;&#959;&#966;&#943;&#945;
-on Java 1.7, but complete compatibility is not guaranteed due to continuing
-changes to the JVM and class file header formats.<p>
-
-<p>This software requires a library called BCEL which can be downloaded
-
-<a href="http://sofya.unl.edu/files/bcel-5.2.tar.gz">here</a>.  Earlier versions of
-<!-- <a href="../../files/bcel-5.2.tar.gz">here</a>.  Earlier versions of -->
-&#931;&#959;&#966;&#943;&#945; were not packaged with this library included
-however the latest &#931;&#959;&#966;&#943;&#945; version (2.1.7) uses BCEL
+on Java 7, but complete compatibility is not guaranteed due to continuing
+changes to the JVM and class file header formats that the BCEL library
+lacked support for. BCEL has been updated and
+these updates may allow &#931;&#959;&#966;&#943;&#945; to work properly on
+Java 7 and 8.
+<!--There are also newer
+bytecode libraries available that are functionally equivalent to BCEL.  Porting
+&#931;&#959;&#966;&#943;&#945; to use one of these alternative libraries
+would be a sizable effort however.-->
+<p>
+The &#931;&#959;&#966;&#943;&#945; tool uses the Bytecode
+Engineering Library (BCEL) for class file parsing and instrumentation.
+Earlier versions of &#931;&#959;&#966;&#943;&#945;
+software required the BCEL version 5.2 library
+(available <a href="../../files/bcel-5.2.tar.gz">here</a>).
+The latest version (2.1.7) of &#931;&#959;&#966;&#943;&#945; uses BCEL
 6.0 which is included within the  &#931;&#959;&#966;&#943;&#945; package,
 or the jar can be downloaded <a href="../../files/bcel-6.0.jar">here.</a>.
+You may also try using the latest version of BCEL (6.2) from the 
+official <a href="https://commons.apache.org/proper/commons-bcel/download_bcel.cgi">
+site</a>.
 </p>
 <p>Do the following to install &#931;&#959;&#966;&#943;&#945;.</p>
 
@@ -61,7 +71,8 @@ or the jar can be downloaded <a href="../../files/bcel-6.0.jar">here.</a>.
 <p>If you have downloaded version Sofya 2.1.7, the bcel 6.0 beta version is provided within
 the <i>sofya/lib</i> directory.</p>
 <ol>
-<li>Include the <b>sofya/lib/bcel-6.0.jar</b> file on you classpath, assuming that you unzipped sofya into your ${HOME}/tools directory (in csh/tcsh):
+<li>Include the <b>sofya/lib/bcel-6.0.jar</b> file on you classpath, assuming that you unzipped sofya into your
+<code>${HOME}/tools</code> directory (in csh/tcsh):
 <p><code>setenv CLASSPATH &quot;${CLASSPATH}&quot;:${HOME}/tools/sofya/lib/bcel-6.0.jar</code></p></li>
 </ol>
 <p>If you have downloaded an earlier Sofya version (prior to version 2.1.7) follow these steps:</p>
@@ -82,6 +93,6 @@ the <i>sofya/lib</i> directory.</p>
       You may prefer to add this to your classpath in your shell's startup script.</li>
 </ol>
 <hr>
-<p>Page last updated by Wayne Motycka: 10/21/2016</p>
+<p>Page last updated by Wayne Motycka: 08/24/2018</p>
 </body>
 </html>
