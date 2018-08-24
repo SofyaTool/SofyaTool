@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Sofya User Manual: Graph Tools</title>
+</head>
+<body>
+
+<a name="overview"></a>
+<h2 style="text-align:center">&#931&#959&#966&#943&#945 Graph Tools</h2>
+
+<h3>Overview</h3>
+
+<p>The graphs package of &#931&#959&#966&#943&#945 provides functionality for
+statically constructing graphs that encode various types of information about
+a program. As with many static analyses, the information contained in these
+graphs may be approximations. &#931&#959&#966&#943&#945 currently provides
+implementations to construct two types of graphs.</p>
+
+<p>The first type is intra-procedural control flow graphs (CFGs), which are
+used throughout the system and are necessary to implement various components
+such as the structural event dispatchers. These graphs can also provide useful
+information for program understanding. The control flow graphs produced by
+&#931&#959&#966&#943&#945 each encode a basic block representation of the control
+flow for a method in the program, annotated with information about the
+control flow branches in the method. In aggregate, they yield a representation
+of the basic block and branch control flow for the entire program.</p>
+
+<p>The second type is interclass relationship graphs (IRGs). An interclass
+relationship graph is a single graph constructed for an entire program to
+represent all of the inheritance and interface implementation relationships
+between classes and interfaces in a program. These graphs are used internally
+by the control flow graph builder to guide the advanced inter-procedural
+algorithms for performing type inference on exceptions to provide more
+precise representations of control flow caused by exceptions.</p>
+
+<a name="cfg"></a>
+<h3>Running the Control Flow Graph builder</h3>
+
+<p>To run the CFG builder to build control flow graphs for a class,
+use the following command:</p>
+
+<p><code>java sofya.graphs.cfg.jCFG [-tag <i>tag</i>] &lt;classname|jarfile|listfile&gt;
+ [classname|jarfile ...]</code></p>
+
+<p>The <code>tag</code> parameter may be used to associate an identifying tag
+with the control flow and map files in the &#931&#959&#966&#943&#945 database.
+This is necessary if you intend to use the test selection tool DejaVu. If you
+specify a tag to the CFG builder, you must supply the same tag to any other
+tool which requires access to the control flow and map files (filters,
+viewers, etc...).</p>
+
+<p>If you include the '.class' extension when specifying a single class, it is interpreted
+as an absolute path name. If the extension is excluded, the class must be specified using its
+fully qualified name, and &#931&#959&#966&#943&#945 will attempt to load it from the classpath.
+Regardless of how a class is specified, the generated database files will always reference the
+class by its fully qualified name. The tool will output control flow and map
+files for the class to the &#931&#959&#966&#943&#945 database directory that can then be used by other
+&#931&#959&#966&#943&#945 tools and viewed using the viewers described below.</p>
+
+<p>The CFG builder also accepts jar files and program list files to specify the classes
+for which to build control flow graphs. Program list files are automatically found
+in the database, using the specified tag, if any. Any necessary path information
+should be provided when passing a jar file as an argument. When a jar file is passed
+as an argument on the command line, control flow graphs are built for every class in
+that jar. The preferred way to include classes in a jar file is to include the jar file
+in a program list file and supply the program list file as an argument instead, as a
+program list file permits you to exclude classes in the jar from processing. Any number
+of specific classes, jar files, and program list files can be passed to the CFG builder,
+though supplying a single program list file is the expected typical use.</p>
+
+<p>Control flow graphs created by &#931&#959&#966&#943&#945 can be viewed using the
+<a href="viewers.html#cfview">control flow graph viewer</a>.</p>
+
+<p><strong>Note:</strong> The environment variable Classpath should be specified with only the current path of the program which Control Flow Graphs will be create. If the program has more than one version, you should be very careful in selecting the desired version, the classpath must contain only the path for the current version. Different versions of programs on your classpath can create unexpected results on the Control Flow Graphs. </p>
+
+<a name="irg"></a>
+<h3>Running the Interclass Relation Graph builder</h3>
+
+<p>To run the IRG builder to construct an interclass relationship graph for a program,
+use the following command:</p>
+
+<p><code>java sofya.graphs.irg.jIRG [-tag <i>tag</i>] &lt;listfile&gt;</code></p>
+
+<p>The <code>tag</code> parameter may be used to associate an identifying tag
+with the resulting graph in the &#931&#959&#966&#943&#945 database; this is
+optional. Note that the control flow graph builder handles the creation of these
+graphs internally, as necessary.</p>
+
+<p>The <i>listfile</i> is a program list file containing the names of the classes
+and interfaces for which the interclass relationship graph is to be constructed.
+It is found in the database directory, using the specified tag, if any.</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

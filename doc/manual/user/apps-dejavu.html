@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Sofya User Manual: Applications: DejaVu</title>
+</head>
+<body>
+
+<h2 style="text-align:center">Using the DejaVu Regression Test Selector</h2>
+
+<p>The first step in using DejaVu is to create a test history file for the version of the
+program against which test selection will be performed. This is accomplished by performing
+the following steps:</p>
+<div>
+<ol>
+<li>Use the <a href="graphs.html#cfg">CFG builder</a> to create control flow graphs for every class
+of interest using a unique database tag (the resulting files will be placed in the database
+directory and will be available to other &#931&#959&#966&#943&#945 tools).</li>
+<li><a href="ed-structural.html">Instrument</a> the classes for basic block event dispatch,
+and collect trace files by executing the program using the basic block tracer
+(<code>BBTracer</code>).</li>
+<li>Use the <a href="tools.html#thbuild">test history builder</a> to construct the test
+history file.</li>
+</ol>
+</div>
+
+<p>Next you need to create control flow graphs for the new version of the program for
+which you want to select tests. Run the control flow graph on the same set of classes
+in the new version, but using a different database tag. You are now ready to invoke
+DejaVu as follows:</p>
+
+<p><code>java sofya.apps.DejaVu &lt;old_prog_file&gt; &lt;new_prog_file&gt;
+ &lt;test_history_file&gt; &lt;-t <i>s|l|t</i>&gt; &lt;-tag1 <i>old_tag</i>&gt;
+ &lt;-tag2 <i>new_tag</i>&gt;</code></p>
+
+<p>DejaVu will then display the selected tests for the new version, in the format specified
+using the <code>-t</code> parameter. Specifying '<code>s</code>' will cause DejaVu to display
+statistical information about the selected tests. A value of '<code>l</code>' will result
+in a plain list of selected tests, suitable for supplying as input to another tool. The
+final value '<code>t</code>' is the most useful for viewing as it will display a tabular
+view correlating each method to the tests selected due to changes in that method. A data
+file is also produced in the database directory, using the tag for the new version of the
+program, that contains the test selection results. The
+<a href="viewers.html#tsview">TestSelectionViewer</a> can be used to view the selected tests
+at a later time without having to rerun DejaVu.</p>
+
+<p>The '<code>prog</code>' parameters are specified in the same manner as with the
+test history builder. Their corresponding <code>prog.lst</code> files should be in the
+respective tag subdirectories in the &#931&#959&#966&#943&#945 database.</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# robots.txt file for SIR
+
+# Prevent access to rendering mode changing link
+User-Agent: *
+Disallow: /php/set-page.php

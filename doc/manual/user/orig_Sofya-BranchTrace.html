@@ -1,0 +1,377 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Sofya Branch Trace Interpretation</title>
+<style type="text/css">
+h2 {
+  text-align:center;
+}
+h3 {
+  font-size: medium;
+}
+code {
+  font-size: large;
+}
+</style>
+</head>
+<body>
+<h2>Branch Tracing with Sofya</h2>
+<p>
+Branch tracing in Sofya generates a list of covered edges in the CFG graph of
+the subject being analyzed.  The edges returned are not the edges reported in
+the <code>sofya.viewers.CFGViewer</code> output however, but are instead an
+internally represented edge-id specific
+to the true/false paths (for -I <em>if</em> type branch coverage) that are
+traversed.
+The problem of which edge was traversed is further complicated by the way Sofya
+subsumes edges that are not related to the instrumented branch type (e.g.
+<em>if</em> branches.)  Sofya will <b>not</b> enumerate intermediate edges
+that are present between these branches but instead only reports the edges
+that are directly associated with the instrumented branch type.
+</p>
+<p>
+The best way to explain this difference in edge identifiers is by an example
+with a sample test program, Test.java.  The source for Test.java is as follows:
+</p>
+<pre style="border:solid;border-width:1px">
+public class Test {
+    public static void main(String[] args) {
+        Test test=new Test();
+        test.findsVertex("T");
+    }
+
+    public  String findsVertex( String theName ) {
+      int i=0;
+      String theVertex;
+      String[] vertices=new String[]{"S","X","T","DD"};
+      // if we are dealing with the root
+      if ( theName==null )
+          return null;
+
+      for( i=0; i < vertices.length; i++ ) {
+          theVertex = ( String )vertices[i];
+          if ( theName.equals(theVertex) )
+              return theVertex;
+      }
+      return null;
+    }
+}
+</pre>
+<div style="font-size:10pt"><b>Listing 1: Test.java</b></div>
+<p>
+Using the <code>sofya.graphs.cfg.jCFG</code> analysis tool on Test.java
+produces the Sofya CFG file <code>$HOME/.sofyadb/Test.java.cf</code>.
+For our example Test.java, this is the <code>Test.java.cf</code>
+file that is created by the <code>jCFG</code> tool:
+</p>
+<pre style="border:solid;border-width:1px">
+$ cat $HOME/.sofyadb/Test.java.cfg
+
+0 Control Flow Information
+0 File: Test.java Created: Fri May 13 07:41:50 CDT 2011
+0 version 2.1.2-beta
+0
+1 "Test.public_String_findsVertex(String_arg1)" 11 11 8 8
+4 Test#findsVertex#(Ljava/lang/String;)Ljava/lang/String;
+3 1 2 1 1:16
+3 2 4 2 2:1 T
+3 3 3 2 3:1 F
+3 4 10 3 3:1
+3 5 5 4 2:1
+3 6 9 5 5:1 T
+3 7 6 5 6:1 F
+3 8 8 6 4:1 T
+3 9 7 6 7:1 F
+3 10 10 7 7:1
+3 11 5 8 4:1
+3 12 10 9 5:1
+0 end of method Test.public_String_findsVertex(String_arg1)
+1 "Test.public_static_void_main(String[]_arg0)" 10 10 6 6
+4 Test#main#([Ljava/lang/String;)V
+3 1 2 1 1:16
+3 2 3 2 2:8 &#60;r&#62;
+3 3 4 3 2:8
+3 4 5 4 4:8 &#60;r&#62;
+3 5 6 5 4:8
+3 6 7 6 4:8
+3 7 9 2 3:8 &#60;any&#62;
+3 8 10 4 5:8 &#60;any&#62;
+0 end of method Test.public_static_void_main(String[]_arg0)
+1 "Test.public_void_&#60;init&#62;()" 4 4 2 2
+4 Test#&#60;init&#62;#()V
+3 1 2 1 1:16
+3 2 3 2 1:16
+0 end of method Test.public_void_&#60;init&#62;()
+</pre>
+<div style="font-size:10pt"><b>Listing 2: <code style="font-size:10pt">Test.java.cf</code> file</b></div>
+<p>
+This raw CFG output can be viewed using the <code>sofya.viewers.CFViewer</code>
+class.  The output from the viewer would look like this:
+</p>
+<pre style="border:solid;border-width:1px">
+<a name="list3"></a>
+$ java sofya.viewers.CFViewer Test.java
+Control Flow Information for File Test.java
+
+Method: "Test.public_void_&#60;init&#62;()"
+CFG root node: 1
+node   label   endline   cf-successors (node-id(edge-id,"edge-label"))
+----------------------------------------------------------------------------
+   1     E          0       2(1,-)
+   2     K          4       3(2,-)
+   3     X          4
+   4     X          4
+
+Method: "Test.public_String_findsVertex(String_arg1)"
+CFG root node: 1
+node   label   endline   cf-successors (node-id(edge-id,"edge-label"))
+----------------------------------------------------------------------------
+   1     E          0       2(1,-)
+   2     K         29       4(2,"T")  3(3,"F")
+   3     K         33      10(4,-)
+   4     K         35       5(5,-)
+   5     K         40       9(6,"T")  6(7,"F")
+   6     K         53       8(8,"T")  7(9,"F")
+   7     K         57      10(10,-)
+   8     K         61       5(11,-)
+   9     K         65      10(12,-)
+  10     X         65
+  11     X         65
+
+Method: "Test.public_static_void_main(String[]_arg0)"
+CFG root node: 1
+node   label   endline   cf-successors (node-id(edge-id,"edge-label"))
+----------------------------------------------------------------------------
+   1     E          0       2(1,-)
+   2     F          4       3(2,"&#60;r&#62;")  9(7,"&#60;any&#62;")
+   3     T          4       4(3,-)
+   4     F         11       5(4,"&#60;r&#62;") 10(8,"&#60;any&#62;")
+   5     T         11       6(5,-)
+   6     K         15       7(6,-)
+   7     X         15
+   8     X         15
+   9     X          4
+  10     X         11
+</pre>
+<div style="font-size:10pt;text-align:left;"><b>Listing 3: Output of <code style="font-size:10pt">CFViewer</code> for Test.java</b></div>
+<p>
+Drawing the CFG from the <code>CFViewer</code> output for the <em>findVertex()</em>
+method in Test.java would produce a CFG diagram like this:
+</p>
+<div class="western" style="text-align:center;margin-bottom: 0in; font-weight: medium; float:left; width:55%;">
+<img src="Test.java.cfg.png" name="CFG_of_Test.java" width=305 height=410 alt="CFG Graph of Test.java" style="border:0;">
+<br />
+</div>
+<p style="vertical-align:top;">
+The <code>CFViewer</code> output provides block and edge-ids that are correct
+for the purposes of
+analyzing the <em>findVertex()</em> method within the Test.java subject when basic
+block type analysis is performed.
+</p>
+<div style="">
+<br /><br /><br />
+<br /><br /><br />
+<br /><br /><br />
+<br /><br /><br /><br />
+<br /><br /><br /><br />
+</div>
+<p>Branch tracing analysis in Sofya localizes the edges of concern to only
+those that
+are representative of the <em>branch type</em> being traced.  These edge-ids
+frequently diverge from the edge-ids assigned in CFG analysis due to this
+focus on branch-type concerns and the subsumed edges in the Sofya branch
+analysis.
+</p>
+<p>
+<a href="http://sofya.unl.edu/doc/manual/user/ed-structural.html#cfInst">
+Instrumenting</a> the Test subject for tracing <em>if</em> branches
+using <code>sofya.ed.cfInstrumentor</code> and
+<a href="http://sofya.unl.edu/doc/manual/user/ed-structural.html#BranchTr">executing</a> the subject using <code>sofya.ed.BranchTracer</code>
+produces an output file, <code>instout.tr</code>, which contains:
+</p>
+<pre style="border:solid;border-width:1px;">
+$ java sofya.viewers.TraceViewer ~/.sofyadb/instout.tr
+Trace Information for trace file /home/username/.sofyadb/instout.tr
+Trace Type: If
+
+Method: "Test.public_void_&#60;init&#62;()"
+
+Method: "Test.public_String_findsVertex(String_arg1)"
+Edges Hit:    2   4   6   7
+
+Method: "Test.public_static_void_main(String[]_arg0)"
+</pre>
+<div style="font-size:10pt"><b>Code Listing 4: Output of <code style="font-size:10pt">TraceViewer</code> for Test.java</b></div>
+<p>
+Notice that the edges hit are 2, 4, 6 and 7 within the method
+<em>findVertex()</em>.  If we look at what edges these
+are in the CFViewer output of <a href="Sofya-BranchTrace.html#list3">
+ Listing 3</a> above, the edges traversed are
+not the ones we expected,
+e.g. edge 4 could not have been traversed since it leads directly from node
+3 to node 10 which is an error exit node and we know (by code inspection) that
+the program terminated normally.
+</p>
+<p>
+Instead of looking at the edges in the <code>CFViewer</code> output we need to
+look at
+the edge identifiers embedded within the original <code>Test.java.cf</code> file.
+The format of this file is not documented.  An empirically derived definition
+of this file is as follows:
+</p>
+<table border="1" frame="border" rules="none" cellspacing="10" style="width:60%;">
+<tr>
+<td>Column&nbsp;1:</td>
+<td>This essentially a type field.  A 1 indicates the start of a method
+including the method name, a 3 indicates a trace data frame, and a 4
+indicates the internal (unique) signature of this method</td>
+</tr>
+<tr>
+<td>Column&nbsp;2:</td>
+<td>contains the basic block node number in this method</td></tr>
+<tr><td>
+Column&nbsp;3:</td>
+<td>contains the successor node/block number</td></tr>
+<tr><td>Column&nbsp;4:</td>
+<td>contains the predecessor node/block number (usually the same as col 2)</td></tr>
+<tr><td>Column&nbsp;5:</td>
+<td><em>THIS IS THE INTERESTING ONE THAT CONTAINS THE REPORTED EDGE-IDS THAT
+ARE RETURNED BY THE BRANCH TRACE.</em>  The value before the colon is the
+edge-id and the number following is used for 'switch' type branches</td></tr>
+</table>
+<p>
+Knowing that the branch trace reported edge-ids are in column 5, we can now
+analyze the output.  The edge-ids reported were 2, 4, 6, and 7 in <em>findVertex()</em>.
+Focusing on the <em>findVertex()</em> method, we see that edge-id
+2 is in column 5 on line 4 of the original <code>Test.java.cf</code> file:</p>
+<pre>
+     edge-id 2
+       here
+        &#8595;
+3 2 4 2 2:1 T
+</pre>
+<p>
+Which indicates that at basic block 2 we have an edge, with
+the internal edge-id of 2, that goes from basic block 2 to
+basic block 4 when the condition is true (T).  Looking further
+in column 5 we also find this line with edge-id of 2:
+</p>
+<pre>
+     edge-id 2
+       here
+        &#8595;
+3 5 5 4 2:1
+</pre>
+<p>
+In this case, the Sofya analysis subsumes the first edge between
+nodes 2 and 4 into the edge between 4 and 5.  This is because
+node 4 can only proceed to node 5 and Sofya tries to limit the
+reporting of edges to only those where the instrumented <em>branch type</em>
+is expressed by the code logic.
+</p>
+<p>
+So, we see that this edge-id 2 actually consists of edges 2 and 5
+in the CFG as well as containing/subsuming node 4.
+</p>
+<p>
+Similarly, we find edge-id 4 on lines 10 and 13 of <code>Test.java.cf</code>:
+</p>
+<pre>
+3 8 8 6 4:1 T
+...
+3 11 5 8 4:1
+</pre>
+<p>
+As with edge-id 2, again we have two CFG edges that form this
+internal edge-id 4 which connects node 6 to node 8 (along CFG edge-id 8) and
+from node 8 to node 5 (via CFG edge-id 11) in the CFG.
+</p>
+<p>
+When diagrammed, the CFG that results from the subsumption of nodes and edges
+by Sofya would look like this
+(with the original nodes or subsumed nodes as comma separated lists and
+using these internal edge-ids labels) and the associated <em>findVertex()</em> method
+as it is represented in the <code>Test.java.cf</code> file for comparison:
+</p>
+<div class="western" STYLE="text-align:center; margin-bottom:0in; font-weight:medium; float:left;">
+<img src="Test.java.edge_cfg.png" name="EdgeCFG_Test.java" width=405 height=520 alt="Branch Traced If-Edges CFG Graph of Test.java with Subsumed Edges and Nodes" style="border:0;">
+<br />
+</div>
+<pre>
+1 "Test.public_String_findsVertex(String_arg1)" 11 11 8 8
+4 Test#findsVertex#(Ljava/lang/String;)Ljava/lang/String;
+3 1 2 1 1:16
+3 2 4 2 2:1 T
+3 3 3 2 3:1 F
+3 4 10 3 3:1
+3 5 5 4 2:1
+3 6 9 5 5:1 T
+3 7 6 5 6:1 F
+3 8 8 6 4:1 T
+3 9 7 6 7:1 F
+3 10 10 7 7:1
+3 11 5 8 4:1
+3 12 10 9 5:1
+</pre>
+<div>
+<br /><br /><br /><br />
+<br /><br /><br /><br />
+<br /><br /><br /><br />
+<br /><br /><br /><br />
+</div>
+<p>
+This interal edge-id information can also be viewed using the <em>-ext</em>
+flag to the <code>CFViewer</code> tool.  In the -ext output these internal
+edge-ids are referred to as <em>[branch-ids]</em>, as you can see in the
+following <code>CFViewer</code> output:
+</p>
+<pre style="border:solid;border-width:1px;">
+$ java sofya.viewers.CFViewer -ext Test.java
+Control Flow Information for File Test.java
+
+Method: "Test.public_void_&#60;init&#62;()"
+CFG root node: 1
+              offsets    successors
+node label    S      E     node-id(edge-id,"edge-label",[branch-ids])
+--------------------------------------------------------------------------------
+   1   E      0      0     2(1,-,[1])
+   2   K      0      4     3(2,-,[1])
+   3   X      4      4
+   4   X      0      4
+
+Method: "Test.public_String_findsVertex(String_theName)"
+CFG root node: 1
+              offsets    successors
+node label    S      E     node-id(edge-id,"edge-label",[branch-ids])
+--------------------------------------------------------------------------------
+   1   E      0      0     2(1,-,[1])
+   2   K      0     29     4(2,"T",[2])   3(3,"F",[3])
+   3   K     32     33    10(4,-,[3])
+   4   K     34     36     8(5,-,[2])
+   5   K     39     49     7(6,"T",[5])   6(7,"F",[6])
+   6   K     52     53    10(8,-,[6])
+   7   K     54     54     8(9,-,[5])
+   8   K     57     61     5(10,"T",[4])   9(11,"F",[7])
+   9   K     64     65    10(12,-,[7])
+  10   X     65     65
+  11   X      0     65
+
+Method: "Test.public_static_void_main(String[]_args)"
+CFG root node: 1
+              offsets    successors
+node label    S      E     node-id(edge-id,"edge-label",[branch-ids])
+--------------------------------------------------------------------------------
+   1   E      0      0     2(1,-,[1])
+   2   F      0      4     3(2,"&#60;r&#62;",[2])   9(7,"&#60;any&#62;",[3])
+   3   T      4      4     4(3,-,[2])
+   4   F      7     11     5(4,"&#60;r&#62;",[4])  10(8,"&#60;any&#62;",[5])
+   5   T     11     11     6(5,-,[4])
+   6   K     14     15     7(6,-,[4])
+   7   X     15     15
+   8   X      0     15
+   9   X      0      4
+  10   X      7     11
+</pre>
+</body>
+</html>

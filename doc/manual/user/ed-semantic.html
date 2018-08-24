@@ -1,0 +1,636 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Sofya User Manual: Event Dispatch: Semantic</title>
+<style type="text/css">
+P.i1 { margin-left:2em }
+P.i2 { margin-left:4em }
+</style>
+</head>
+<body>
+
+<h2 style="text-align:center">Using the semantic event dispatch framework</h2>
+
+<p>Contents of this document:</p>
+<ul>
+<li><a href="#edl">Writing an event description language (EDL) specification</a></li>
+<li><a href="#observables">Observable events</a></li>
+<li><a href="#exdesc">Example EDL specification</a></li>
+<li><a href="#dispatch">Running the event dispatcher</a></li>
+<li><a href="#implnotes">Notes on implementation and concurrency issues</a></li>
+<li><a href="edl_bnf_table.html">EDL grammar</a> and <a href="edl_bnf_detail.html">grammar details</a></li>
+</ul>
+
+<h3>Overview</h3>
+
+<p>An important concept used by the semantic event dispatch framework is the notion that
+it is useful to identify some subset of the larger system for observation and analysis.
+Such a subset of the system is referred to as a <em>module</em> for convenience, even
+though the subset may comprise more than one logical module of the system under analysis.
+The framework then uses instrumentation and the
+<a href="http://java.sun.com/j2se/1.4.2/docs/guide/jpda/jdi/index.html">
+Java Debug Interface</a> (JDI) to generate a stream of events occurring in the
+module as the program executes, and dispatches that stream of events to registered
+listeners. Event dispatch for concurrent Java programs is fully supported.</p>
+
+<p>The quickest path to using this framework is to write an event description language
+(EDL) specification for the Java program of interest. An EDL specification describes
+the module for which to generate an event stream, and is defined as a set of classes
+and observables associated with those classes for which events should
+be dispatched. The full set of observables currently supported is described in
+the <a href="#observables">observables</a> section.</p>
+
+<p>The framework is also designed to be utilized as a programmable interface.
+Event specifications can be supplied to the event dispatcher by creating a class
+that implements the event specification interface. There are components
+provided to facilitate implementation of custom filters that can be attached
+to the event stream to select events of interest for particular analyses. Clients
+of the framework therefore have great flexibility in defining what events they
+want to observe, and in selecting relevant events from the stream to perform
+their analyses.</p>
+
+
+<h3><a name="edl"></a>Writing an Event Description Language (EDL) Specification</h3>
+
+<p>An event description language specification is comprised of a set of sections that
+define the observables for which events are to be generated in the event stream, and
+that provide facilities for specifying conditions on the locations in which
+the events related to those observables should be witnessed. The following is
+the informal, basic structure of an EDL specification:</p>
+<pre>
+  begin <b>EDLSuite</b> <i>&lt;name&gt;</i>
+    ( global_array_element_bounds )*
+  end
+  ( (begin <b>Observables</b> <i>&lt;key&gt;</i>
+      begin <b>Preamble</b>
+          System-classes: <i>&lt;prog_file&gt;</i>
+          <i>(Preamble declarations...)</i>
+      end
+      (
+        (+ | -) <i>observable_event_request</i> [ {
+            (<i>locationCondition</i>)*
+            } ]
+      )*
+    )
+  | (@import &quot;<i>&lt;edl_file&gt;</i>&quot;)
+  )+
+
+<i>Preamble declarations</i>:
+  ( Module-classes: &lt;<i>prog_file</i>&gt;
+    | No-module: ("true" | "false") )
+  [ Database-tag: &lt;<i>tag</i>&gt; ]
+  [ Type-name: &lt;<i>type_name</i>&gt; (&lt;<i>jni_signature</i>&gt; | &lt;<i>class_name</i>&gt;) ]
+
+</pre>
+<p>
+where
+</p>
+<ul>
+<li><i>name</i> is a name to be associated with the EDL specification. It is used
+to track and store generated framework data associated with the specification.</li>
+<li><i>key</i> is a name to be associated with an <b>Observables</b> section. These
+uniquely distinguish independent observable event specifications.</li>
+<li><i>prog_file</i> is a reference to a &quot;program list file&quot; in the
+database directory. In addition to the name, it should include (just) the
+extension &quot;.prog&quot;.</li>
+<li><i>observable_event_request</i> is a record specifying the inclusion or
+exclusion of a type of observable event, as described in the EDL grammar
+(linked below) and later in this document.</li>
+<li><i>edl_file</i> is the name of another EDL file to be textually imported at
+the given location.</li>
+<li><i>class_name</i> is a fully qualified class name using dot notation.</li>
+<li><i>jni_signature</i> is a type signature using the Java Native Interface (JNI)
+style notation (refer to the Java Language Specification).</li>
+</ul>
+
+<p>For a full formal specification, it is recommended that you refer to the
+<a href="edl_bnf_table.html">BNF grammar for EDL</a>. It may also be helpful to look at the
+<a href="edl_bnf_detail.html">detailed grammar breakdown</a>, with documentation and additional
+details on particular productions in the EDL grammar.
+</p>
+<p>The remainder of this document is intended as a quickstart guide for writing
+EDL specifications.
+
+<h4>EDLSuite Section</h4>
+
+<p>The <b>EDLSuite</b> section defines a name to be associated with the rest of
+the EDL specification. This name is used by the framework to store the
+information derived from the remainder of the specification to make it
+available to the semantic event dispatcher. The name should be unique; if there
+is a name collision you will be notified when you run the semantic
+instrumentor (this is not, however, considered a warning, as it may occur
+if you run the instrumentor more than once on the same EDL specification).
+</p>
+
+<p>Global array element bounds can also be declared in the <b>EDLSuite</b>
+section. This is accomplished with one or more
+&quot;<code>array_element_load_bounds</code>&quot; or
+&quot;<code>array_element_store_bounds</code>&quot; declarations. The format
+of these declarations is the same as for the
+&quot;<code>array_element_load</code>&quot; and
+&quot;<code>array_element_store</code>&quot; event requests (see below), except
+that at least one of the minimum or maximum bounds must be given. A global
+element index bound applies when the element type and event type matches
+with a array element event request in an <b>Observables</b> section, and
+that event request does not specify the corresponding bound. Element index bounds
+specified in particular event requests override global bounds. Note that the
+act of declaring global array element bounds does not in itself enable observation
+of array element events &mdash; a corresponding array element event request must be made.
+</p>
+
+<h4>Observables Section</h4>
+
+<p>An <b>Observables</b> section defines the set of observable events that
+are to be supplied by the semantic event dispatcher. The <i>key</i>
+associated with an Observables section is used to uniquely distinguish
+independent sets of event requests (from here referred to as an
+&quot;event specification&quot;) so that they may operate simultaneously
+to receive required events from the same run of a semantic event dispatcher.
+This is most important when using the adaptive event request features
+of the event dispatcher, in that it enables the event dispatcher to mediate
+conflicting event enable/disable requests such that listeners requiring
+certain events are always guaranteed to receive those events.</p>
+
+<p>A particular <b>Observables</b> section must always begin with a
+<b>Preamble</b> section. The Preamble defines basic information about that
+particular set of observable event requests. The basic piece of information
+that is required in all Preamble sections is a reference to the
+&quot;program list file&quot; that defines all the classes comprising the
+entire system to be monitored. This is the maximal set of classes over which
+the semantic instrumentor will operate to perform the necessary actions
+to capture requested events. The Preamble also supports several optional
+statements:</p>
+<ul>
+<li><b>Module-classes: <i>&lt;prog_file&gt;</i></b> This option specifies a
+program list file in the database that lists classes for which <b>all</b>
+observable events are to be enabled by default. A subtractive approach
+can then be used to selectively disable events within this set of classes
+(see discussion of observable event requests below). This enables easier
+specification of entire subsystems or modules within the monitored system
+for observation. Note that if this option is not provided, and the
+&quot;<b>No-module</b>&quot; (see following) option is absent or is
+<code>false</code>, the set of system classes is treated as the module
+by default (all events in all classes will be observed).</li>
+<li><b>No-module: <i>&lt;true|false&gt;</i></b> This option specifies that
+there are no classes comprising a default module; All events must be
+requested explicitly. <strong>Note that <i>class</i> wildcards ('*' where a
+class name is required) are relative to the module, and thus will not select
+any classes</strong> if this option is enabled (or the module defined using
+<b>Module-classes</b> contains no classes).</li>
+<li><b>Database-tag: <i>&lt;tag&gt;</i></b> This option specifies a database
+tag to be used to locate the program list files referenced by the
+<b>System-classes</b> and <b>Module-classes</b> values.</li>
+<li><b>Type-name: <i>&lt;name&gt;</i> <i>&lt;type_def&gt;</i></b><br> This
+option provides for the definition of substitute names for method
+argument types, as a convenience. Wherever <i>name</i> appears as an
+argument type, it will be replaced by <i>type_def</i>. This allows more
+concise statement of signatures for methods involving long types that
+are otherwise cumbersome. Note that these definitions have highest precedence
+during processing of argument types, thus a matching substitution will always
+be applied even if it overrides a predefined value.</li>
+</ul>
+
+<h4>Observable Event Requests</h4>
+
+<p>An observable event request begins with either a '+' or '-'
+which indicates whether the request will define a rule for including or excluding
+events related to the observable. Next is the name of the observable to which the
+rule applies. The syntax of the remainder of the line is then variable depending
+on the type of the observable the rule addresses, as described in the
+<a href="#observables">list of observables</a> below.</p>
+
+<p>For many observables, it is possible to specify conditions that constrain
+the locations at which the events relevant to the observable will be witnessed.
+These conditions are specified within braces using the keywords 'in' or
+'not'. An 'in' condition specifies that an observable event
+should only be raised if the event occurred in a given location. A 'not'
+condition specifies that an observable event should only be raised if the event
+did not occur in a given location. Requests that permit location conditions
+require the use of the brace notation, however, specifying no conditions is
+permitted and is treated as the equivalent of 'any location'.</p>
+
+<p>Many observables can be specified using wildcards. For example, all fields in
+a class can be included with a notation such as this: 'SomeClass.*'.
+However this leads to the possibility that the rules specifying inclusion and
+exclusion of observables can conflict. Therefore requests also have a precedence,
+which is assigned in increasing order as the <b>Observables</b> section is read from
+top to bottom. Requests with higher precedence always overrule requests of lower
+precedence, which allows greater flexibility in defining the observables to
+be included. For example, a rule of lower precedence might specify that a broad
+set of observables are to be included, but a rule of higher precedence will
+selectively exclude certain observables within that set. For any observable,
+the rule matching the observable with the highest precedence will always be
+applied.</p>
+
+<p>Precedence also affects the location conditions; in fact, the precedence is
+actually associated with each condition (though an implied precedence is assigned for
+requests that have no conditions). A request with higher precedence but with
+a location condition that does <strong>not</strong> conflict with the location
+condition on a request with lower precedence will not override the rule from the
+request with lower precedence. If there is a hierarchical relationship between
+two locations, the location conditions will nest within each other, thus
+an 'in' rule followed by a 'not' rule can be read as:
+&quot;the event should be generated if it happens in location X but only if
+not in location Y within X&quot;. For location conditions that conflict with
+each other without a nesting relationship, the conditions with highest
+precedence are applied as usual.</p>
+
+<p>Location conditions within different observable event requests (for the same
+type of observable) will also be nested if appropriate. The requests themselves,
+however, are <strong>never</strong> nested, they can only override some subset
+(or superset) of a prior record. This is an important consideration to be careful
+of when writing more complex specifications.</p>
+
+<p>The scope of precedence is limited to each event specification
+(<b>Observables</b> section). In other words, event requests in one event
+specification do not have a precedence with respect to event requests in
+another event specification. Each event specification is an independent
+entity.</p>
+
+
+<h4><a name="observables"></a>Supported Observable Events</h4>
+
+<p>The following is a current list of types of events that can
+be requested in an EDL specification. It is presented using a style similar
+to EBNF notation, but in a manner that is intended to more clearly illustrate
+the construction of the event requests, as compared to the formal grammar.
+The syntax used is as follows:</p>
+<ul>
+<li>( ) : expression/choice grouping</li>
+<li>[ ] : optional expression</li>
+<li>| : choice between two or more expressions</li>
+<li>* : zero or more occurrences</li>
+<li>+ : one or more occurrences</li>
+<li>"(text)" : literal string or keyword</li>
+<li><i>text</i> : string identified by symbolic name; the valid structure can
+be determined from the formal grammar, most often a string that is legal as
+a Java identifier or a qualified Java identifer</li>
+<li>&lt;<i>:text:</i>&gt; : string identified by a symbolic name that is
+eligible for matching and substitution from the type alias table (type aliases
+specified using &quot;Type-name&quot; declarations in the &quot;Preamble&quot;)</li>
+<li><i>jniMethodSignature</i> : JNI-style method signature string (see
+the Java Virtual Machine Specification for details); essentially:
+<code>"("&lt;type_spec&gt;")"&lt;type_spec&gt;</code>
+</ul>
+
+<p><code>&quot;new_object&quot; ( &lt;<i>:class_name:</i>&gt;[&quot;.*&quot;] | &quot;*&quot; ) &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class for
+which allocation by a <code>NEW</code> instruction should be observed. Wildcards
+are supported. Requires the brace notation for location conditions.</p>
+
+<p><code>&quot;construct_object&quot; &quot;*&quot; | ( &lt;<i>:class_name:</i>&gt; ( &quot;*&quot; | ( &lt;<i>:arg_type_1:</i>&gt; ( &quot;,&quot; &lt;<i>:arg_type_n:</i>&gt; )* ) | <i>jniMethodSignature</i> ) )</code></p>
+
+<p class="i1">Specify the fully qualified name of the class for which
+constructor entry should be observed. Wildcard inclusion of all constructors is
+supported; package qualified wildcards are not supported. If a specific
+class is given, the signature can be specified. Signature wildcard
+is supported. Brace notation for location conditions cannot be used.</p>
+
+<p><code>&quot;construct_finish&quot; &quot;*&quot; | ( &lt;<i>:class_name:</i>&gt; ( &quot;*&quot; | ( &lt;<i>:arg_type_1:</i>&gt; ( &quot;,&quot; &lt;<i>:arg_type_n:</i>&gt; )* ) | <i>jniMethodSignature</i> ) )</code></p>
+
+<p class="i1">Specify the fully qualified name of the class for which
+constructor completion should be observed. Wildcard inclusion of all constructors
+is supported; package qualified wildcards are not supported. If a specific
+class is given, the signature can be specified. Signature wildcard
+is supported. Brace notation for location conditions cannot be used.</p>
+
+<p><code>&quot;get_static&quot; &lt;<i>:class_name:</i>&gt;[&quot;.&quot;<i>field_name</i> | &quot;.*&quot;] &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class and static
+field for which field reads should be observed. Field wildcard is supported to
+specify all static fields of a class as observable on reads. Requires the
+braced notation for location conditions.</p>
+
+<p><code>&quot;put_static&quot; &lt;<i>:class_name:</i>&gt;[&quot;.&quot;<i>field_name</i> | &quot;.*&quot;] &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class and static
+field for which field writes should be observed. Field wildcard is supported to
+specify all static fields of a class as observable on writes. Requires the
+braced notation for location conditions.</p>
+
+<p><code>&quot;get_field&quot; &lt;<i>:class_name:</i>&gt;[&quot;.&quot;<i>field_name</i> | &quot;.*&quot;] &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class and
+instance field for which field reads should be observed. Field wildcard is
+supported to specify all instance fields of a class as observable on reads.
+Requires the braced notation for location conditions.</p>
+
+<p><code>&quot;put_field&quot; &lt;<i>:class_name:</i>&gt;[&quot;.&quot;<i>field_name</i> | &quot;.*&quot;] &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class and
+instance field for which field writes should be observed. Field wildcard is
+supported to specify all instance fields of a class as observable on writes.
+Requires the braced notation for location conditions.</p>
+
+<p><code>&quot;constructor_call&quot; &quot;*&quot; | ( &lt;<i>:class_name:</i>&gt; ( &quot;*&quot; | ( &lt;<i>:arg_type_1:</i>&gt; ( &quot;,&quot; &lt;<i>:arg_type_n:</i>&gt; )* ) | <i>jniMethodSignature</i> ) ) &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class for which
+calls to its constructor(s) should be observed. Wildcard inclusion of all constructor
+calls is supported; package qualified wildcards are not supported. If a
+specific class name is given, the signature can be specified. Signature
+wildcard is supported. Requires the braced notation for location conditions.</p>
+
+<p><code>&quot;static_call&quot; &quot;*&quot; | ( &lt;<i>:class_name:</i>&gt; ( &quot;.*&quot; | ( &quot;.&quot;<i>method_name</i> ( &quot;*&quot; | ( &lt;<i>:arg_type_1:</i>&gt; ( &quot;,&quot; &lt;<i>:arg_type_n:</i>&gt; )* ) | <i>jniMethodSignature</i> ) ) ) ) &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class and static
+method to which calls should be observed. Wildcard inclusion of all static methods
+in the module, or all static methods of a particular class is supported;
+package qualified wildcards are not supported for specifying classes. If a
+specific method name is given, the signature can be specified. Signature
+wildcard is supported. Requires the braced notation for location conditions.</p>
+
+<p><code>&quot;virtual_call&quot; &quot;*&quot; | ( &lt;<i>:class_name:</i>&gt; ( &quot;.*&quot; | ( &quot;.&quot;<i>method_name</i> ( &quot;*&quot; | ( &lt;<i>:arg_type_1:</i>&gt; ( &quot;,&quot; &lt;<i>:arg_type_n:</i>&gt; )* ) | <i>jniMethodSignature</i> ) ) ) ) &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class and virtual
+method to which calls should be observed. Wildcard inclusion of all virtual methods
+in the module, or all virtual methods of a particular class is supported;
+package qualified wildcards are not supported for specifying classes. If a
+specific method name is given, the signature can be specified. Signature
+wildcard is supported. Requires the braced notation for location conditions.</p>
+
+<p><code>&quot;interface_call&quot; &quot;*&quot; | ( &lt;<i>:class_name:</i>&gt; ( &quot;.*&quot; | ( &quot;.&quot;<i>method_name</i> ( &quot;*&quot; | ( &lt;<i>:arg_type_1:</i>&gt; ( &quot;,&quot; &lt;<i>:arg_type_n:</i>&gt; )* ) | <i>jniMethodSignature</i> ) ) ) ) &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class and interface
+method to which calls should be observed. Wildcard inclusion of all interface methods in
+the module, or all interface methods of a particular class is supported;
+package qualified wildcards are not supported for specifying classes. If a
+specific method name is given, the signature can be specified. Signature
+wildcard is supported. Requires the braced notation for location conditions.</p>
+
+<p><code>&quot;virtual_method_enter&quot; &quot;*&quot; | ( &lt;<i>:class_name:</i>&gt; ( &quot;.*&quot; | ( &quot;.&quot;<i>method_name</i> ( &quot;*&quot; | ( &lt;<i>:arg_type_1:</i>&gt; ( &quot;,&quot; &lt;<i>:arg_type_n:</i>&gt; )* ) | <i>jniMethodSignature</i> ) ) ) )</code></p>
+
+<p class="i1">Specify the fully qualified name of the class and virtual
+method into which entry should be observed. Wildcard inclusion of all virtual methods
+in the module, or all virtual methods of a particular class is supported;
+package qualified wildcards are not supported for specifying classes. If a
+specific method name is given, the signature can be specified. Signature
+wildcard is supported. Brace notation for location conditions cannot be used.</p>
+
+<p><code>&quot;virtual_method_exit&quot; &quot;*&quot; | ( &lt;<i>:class_name:</i>&gt; ( &quot;.*&quot; | ( &quot;.&quot;<i>method_name</i> ( &quot;*&quot; | ( &lt;<i>:arg_type_1:</i>&gt; ( &quot;,&quot; &lt;<i>:arg_type_n:</i>&gt; )* ) | <i>jniMethodSignature</i> ) ) ) )</code></p>
+
+<p class="i1">Specify the fully qualified name of the class and virtual
+method from which exit should be observed. Wildcard inclusion of all virtual methods
+in the module, or all virtual methods of a particular class is supported;
+package qualified wildcards are not supported for specifying classes. If a
+specific method name is given, the signature can be specified. Signature
+wildcard is supported. Brace notation for location conditions cannot be used.</p>
+
+<p><code>&quot;static_method_enter&quot; &quot;*&quot; | ( &lt;<i>:class_name:</i>&gt; ( &quot;.*&quot; | ( &quot;.&quot;<i>method_name</i> ( &quot;*&quot; | ( &lt;<i>:arg_type_1:</i>&gt; ( &quot;,&quot; &lt;<i>:arg_type_n:</i>&gt; )* ) | <i>jniMethodSignature</i> ) ) ) )</code></p>
+
+<p class="i1">Specify the fully qualified name of the class and static
+method into which entry should be observed. Wildcard inclusion of all static methods
+in the module, or all static methods of a particular class is supported;
+package qualified wildcards are not supported for specifying classes. If a
+specific method name is given, the signature can be specified. Signature
+wildcard is supported. Brace notation for location conditions cannot be used.</p>
+
+<p><code>&quot;static_method_exit&quot; &quot;*&quot; | ( &lt;<i>:class_name:</i>&gt; ( &quot;.*&quot; | ( &quot;.&quot;<i>method_name</i> ( &quot;*&quot; | ( &lt;<i>:arg_type_1:</i>&gt; ( &quot;,&quot; &lt;<i>:arg_type_n:</i>&gt; )* ) | <i>jniMethodSignature</i> ) ) ) )</code></p>
+
+<p class="i1">Specify the fully qualified name of the class and static
+method from which exit should be observed. Wildcard inclusion of all static methods
+in the module, or all static methods of a particular class is supported;
+package qualified wildcards are not supported for specifying classes. If a
+specific method name is given, the signature can be specified. Signature
+wildcard is supported. Brace notation for location conditions cannot be used.</p>
+
+<p><code>&quot;monitor_contend&quot; ( &lt;<i>:class_name:</i>&gt;[&quot;.*&quot;] | &quot;*&quot; ) &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class for which
+contention for monitors owned by instances of the class should be observed. Wildcards
+are supported. Requires the braced notation for location conditions.</p>
+
+<p><code>&quot;monitor_acquire&quot; ( &lt;<i>:class_name:</i>&gt;[&quot;.*&quot;] | &quot;*&quot; ) &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class for which
+acquisition of monitors owned by instances of the class should be observed. Wildcards
+are supported. Requires the braced notation for location conditions.</p>
+
+<p><code>&quot;monitor_pre_release&quot; ( &lt;<i>:class_name:</i>&gt;[&quot;.*&quot;] | &quot;*&quot; ) &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class for which
+pending release of monitors owned by instances of the class should be observed.
+Wildcards are supported. Requires the braced notation for location conditions.</p>
+
+<p><code>&quot;monitor_release&quot; ( &lt;<i>:class_name:</i>&gt;[&quot;.*&quot;] | &quot;*&quot; ) &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class for which
+the release of monitors owned by instances of the class should be observed.
+Wildcards are supported. Requires the braced notation for location conditions.</p>
+
+<p><code>&quot;throw&quot; ( &quot;*&quot; | &lt;<i>:class_name:</i>&gt; ) [&quot;+s&quot;] &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the throwable class
+for which it should be considered an observable event when an instance of the class
+is thrown. Wildcard inclusion of all classes in the module is supported; package
+qualified wildcards are not supported for specifying classes. The optional
+token '+s' indicates that subclasses of the specified class should also be
+considered observable throwables. Requires the braced notation for
+location conditions.</p>
+
+<p><code>&quot;catch&quot; ( &quot;*&quot; | &lt;<i>:class_name:</i>&gt; ) [&quot;+s&quot;] &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the throwable class
+for which it should be considered an observable event when an instance of the class
+is caught. Wildcard inclusion of all classes in the module is supported; package
+qualified wildcards are not supported for specifying classes. The optional
+token '+s' indicates that subclasses of the specified class should also be
+considered observable throwables. Requires the braced notation for
+location conditions.</p>
+
+<p><code>&quot;static_init_enter&quot; &lt;<i>:class_name:</i>&gt;[&quot;.*&quot;] | &quot;*&quot;</code></p>
+
+<p class="i1">Specify the fully qualified name of the class for which
+entry into the static initializer should be observed. Wildcards are supported.
+Brace notation for location conditions cannot be used.</p>
+
+<p><code>&quot;array_element_load&quot; ( "*" | &lt;<i>:type:</i>&gt; ) ["min:" &lt;uint&gt;] ["max:" &lt;uint&gt;] &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the type of array element for which array reads should be observed.
+Wildcard inclusion of all known types is supported. The same set of input formats are
+accepted for the element type parameter as for the argument type parameters in method
+selection expressions (such as in a location block).</p>
+
+<p class="i1">Minimum and maximum element indexes can also be specified. In the absence of a specified
+minimum or maximum, corresponding values from the global <code>array_element_load_bounds</code>
+matching the given type will apply, if any. The presence of only one of the minimum or
+maximum index bounds, without an overriding global bound for the absent bound, causes all
+reads from the start of the array to the given element (for maximum) or from the given
+element to the end of the array (for minimum) to be observed. If the minimum bound is
+greater than the maximum bound, reads from the &quot;tails&quot; of the array are
+observed (from the start to the maximum, and from the minimum to the end).</p>
+
+<p class="i1">Multiple <code>array_element_load</code> event selections for the same element type may
+result in merging of the element ranges specified using index bounds.</p>
+
+<p><code>&quot;array_element_store&quot; ( "*" | &lt;<i>:type:</i>&gt; ) ["min:" &lt;uint&gt;] ["max:" &lt;uint&gt;] &quot;{&quot; ... &quot;}&quot;</code></p>
+
+<p class="i1">Specify the type of array element for which array writes should be observed.
+Wildcard inclusion of all known types is supported. The same set of input formats are
+accepted for the element type parameter as for the argument type parameters in method
+selection expressions (such as in a location block).</p>
+
+<p class="i1">Minimum and maximum element indexes can also be specified. In the absence of a specified
+minimum or maximum, corresponding values from the global <code>array_element_store_bounds</code>
+matching the given type will apply, if any. The presence of only one of the minimum or
+maximum index bounds, without an overriding global bound for the absent bound, causes all
+writes from the start of the array to the given element (for maximum) or from the given
+element to the end of the array (for minimum) to be observed. If the minimum bound is
+greater than the maximum bound, writes to the &quot;tails&quot; of the array are
+observed (from the start to the maximum, and from the minimum to the end).</p>
+
+<p class="i1">Multiple <code>array_element_store</code> event selections for the same element type may
+result in merging of the element ranges specified using index bounds.</p>
+
+
+<h4>Importing Other EDL Files</h4>
+
+<p>The EDL specification supports a statement of the form:<p>
+<pre>
+  @import "other.edl"
+</pre>
+<p>These statements must appear outside of any section. When an import
+statement is encountered, the parser textually inserts the contents of the
+specified EDL file into the current file at that location. This enables
+one to store event specifications that select events for particular purposes
+(analyses) as fragments in a modular fashion, and then combine them to
+create composite specifications to, for example, check multiple
+independent properties simultaneously.</p>
+
+
+<h3><a name="exdesc"></a>Example EDL Specification</h3>
+
+<p>The following is a very simple EDL specification intended just to
+illustrate the basic behaviors described above.</p>
+
+<pre>
+begin EDLSuite example_spec
+end
+begin Observables example_events
+  begin Preamble
+    System-classes: sys.prog
+    Module-classes: mod.prog
+
+    Type-name: Writer java.io.Writer
+  end
+
+  - virtual_call BlockSynchronization.* {
+      in ProgramCore.*
+      not ProgramCore.setup Writer
+    }
+  + virtual_call BlockSynchronization.init * {
+    }
+end
+</pre>
+
+<p>Classes listed in 'sys.prog' comprise the entire Java program of interest.
+Classes in 'mod.prog' comprise the subset of the system classes that are
+considered observable by default (all observable events within these classes are
+considered included unless explicitly excluded).</p>
+
+<p>The first rule specifies that all calls to virtual methods implemented in the
+class <code>BlockSynchronization</code> are to be excluded if they occur in any method
+in class <code>ProgramCore</code> except if they occur in method 'setup' of
+class <code>ProgramCore</code> that takes a <code>Writer</code> as an argument.
+Note that package qualifiers would be permitted (required, in fact) for
+<code>BlockSynchronization</code> and <code>ProgramCore</code> if appropriate.</p>
+
+<p>The second rule specifies that all calls to the virtual method 'init' of
+class <code>BlockSynchronization</code> with any signature are to be included
+regardless of where they occur. This overrides the first record for calls to
+method(s) 'init', but not for calls to any other method.</p>
+
+
+<h3><a name="dispatch"></a>Running the Event Dispatcher</h3>
+
+<p>To use the semantic event instrumentor from the command line, first create an
+EDL specification as described above. Then run the instrumentor using the following command:</p>
+
+<p><code>java sofya.ed.semantic.SemanticInstrumentor [-dabe] &lt;edl_spec&gt;</code></p>
+
+<p>Normally, the instrumentor inserts instrumentation to observe when the program
+execution leaves and enters the module identified in the specification. This is intended to allow
+the consumer of an event stream to properly maintain the current context of the execution.
+The optional parameter '<code>-dabe</code>' (disable automatic boundary events) is
+provided to instruct the instrumentor to not instrument for these events.</p>
+
+
+<h3><a name="dispatch-trace"></a>Running the Semantic Tracer</h3>
+
+<p>To execute a program instrumented for semantic event dispatch on the command line,
+run the following command:<p>
+
+<p><code>java sofya.ed.SemanticTracer [-cout] &lt;-md <i>data_file</i>&gt;
+&lt;-main <i>main_class</i>&gt; [<i>arg_1</i> <i>arg_2</i> ...]</code></p>
+<p class="i1"><code>-cout</code>
+<p class="i2">Instructs the tracer to echo the events to the
+console on <code>stdout</code>.</p>
+<p class="i1"><code>-md <i>data_file</i></code>
+<p class="i2">Specifies the name of the module data file generated
+by the semantic event instrumentor.</p>
+<p class="i1"><code>-main <i>main_class</i></code>
+<p class="i2">Specifies the fully qualified name of the main class
+that is used to launch the program. The subsequent optional argument parameters
+are the arguments that should be passed to the traced program.</p>
+
+<p>The semantic tracer generates a binary trace file in the current directory
+containing the events raised during the execution of the program. There is
+currently no convenience viewer provided for this type of trace file, nor
+is there a class for reading the trace file programmatically. The format
+of this file can be derived from the <code>TraceFileTarget</code> class,
+however, these trace files are intended primarily as a demonstration of the
+use of the framework. Clients of the framework should write their own
+listeners to generate trace files in whatever format desired, or to process
+the event stream directly online.</p>
+
+
+<h3><a name="implnotes"></a>Notes on Implementation and Concurrency Issues</h3>
+
+<p>Monitoring multi-threaded systems in Java poses special challenges for instrumentation.
+It was determined through the course of implementation that it would not be possible
+to monitor all types of observables solely through the use of instrumentation. The
+principle problem is that it must be possible to guarantee the atomic integrity of
+information transmitted from the probes inserted in the instrumentation process.
+Unfortunately the only means to guarantee the atomicity of such information for some
+types of observables is synchronization of probes on a system-global common lock,
+which excessively interferes with the natural behavior of the system. This
+degree of interference would also invalidate the information obtained. Therefore this
+implementation uses the Java Debug Interface in conjunction with instrumentation to
+meet the need for monitoring specified observables in a non-disruptive manner.</p>
+
+<p>In order to collect information about some types of specified observables, the
+implementation applies instrumentation at the bytecode level, by operating on the
+class files comprising the system. The instrumentor may potentially insert
+instrumentation into any class in the system, as this is often necessary to monitor
+all actions related to certain types of observables. Instrumentation is also
+used in some cases to improve the efficiency of the runtime monitoring over that
+yielded by the JDI.</p>
+
+<p>Probes are currently inserted to observe allocation of new objects, invocation of
+constructors and methods, and entry into methods. Method calls and entries
+are observed using instrumentation probes due to the nature of the JDI. Requesting
+observation of method entries and exits through the JDI is all or nothing.
+Constraining observation of such events in the manner desired for this application,
+for example observing only methods matching a certain signature,
+would require a filtering process in the tracing tool. Many unnecessary events would
+be raised by the JDI, in addition to the extra cost of applying this dynamic filtering
+in the tracing tool. By instead inserting probes in the bytecodes to specifically
+observe events relevant only to specified methods, a considerable reduction in
+overhead is achieved.</p>
+
+<p>The result of the instrumentation process is set of class files containing the
+probes necessary to monitor a subset of the observables defined in the EDL
+specification, and a module data file to be supplied to the event dispatcher which
+contains information necessary for that tool to provide complete coverage
+of the specified observables. Among other things, this data file contains a compiled
+version of the EDL specification.</p>
+
+<p><em>Note that the instrumentation should only ever be applied once, or the
+behavior is undefined.</em> If the parameters of the instrumentation need to
+be changed, the system should be recompiled first and then instrumented again.</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

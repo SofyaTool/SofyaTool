@@ -1,0 +1,870 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" content="text/html; charset=ISO-8859-1">
+<TITLE>BNF for edl.jj</TITLE>
+</HEAD>
+<BODY>
+<H1 ALIGN=CENTER>BNF for edl.jj</H1>
+<H2 ALIGN=CENTER>NON-TERMINALS</H2>
+<PRE>
+//****************************************
+// EDL Grammar
+//****************************************
+
+/**
+ * Initiates the parse of an event description language (EDL) file.
+ *
+ * @return A {@link SemanticEventData} object encapsulating the parsed
+ *     event specifications.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>edlUnit</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod1">edlUnit</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod2">suiteDecl</A> ( <A HREF="#prod3">observablesSection</A> | <A HREF="#prod4">importDecl</A> )+ &lt;EOF&gt; )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL import declarations.
+ *
+ * The imported EDL fragment is processed as if it textually appeared
+ * in the importing file. The lexer is reassigned to a stream attached
+ * to the imported file, without modifying any other lexer or parser
+ * state. When processing of the imported file is completed, the lexer
+ * stream is restored to the importing file and processing resumes.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>importDecl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod4">importDecl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"@import" &lt;STRING_LITERAL&gt;</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Entry point for processing an imported EDL fragment. An imported
+ * fragment cannot contain an "EDLSuite" declaration.
+ *
+ * This production is never referenced directly in the grammar -- it
+ * is only called from the action associated with the importDecl()
+ * production.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>importEdlUnit</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod5">importEdlUnit</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod3">observablesSection</A> | <A HREF="#prod4">importDecl</A> )+ &lt;EOF&gt;</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for the "EDLSuite" section of an EDL specification.
+ *
+ * A &lt;WILD_STRING&gt; is a string that can contain nearly every character
+ * in the legal input character set except whitespace (the same character
+ * set accepted by Java). If whitespace must appear within the token,
+ * a (quoted) &lt;STRING_LITERAL&gt; should be used instead.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>suiteDecl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod2">suiteDecl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"begin" "EDLSuite" ( &lt;STRING_LITERAL&gt; | &lt;WILD_STRING&gt; ) ( <A HREF="#prod6">array_element_load_bounds__decl</A> | <A HREF="#prod7">array_element_store_bounds__decl</A> )* "end"</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for global array element load bounds specifications in the
+ * EDLSuite header section.
+ *
+ * A &lt;UINT&gt; is a positive integer (whole number) value, with no
+ * leading zeros.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>array_element_load_bounds__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod6">array_element_load_bounds__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "array_element_load_bounds" ( "*" | <A HREF="#prod8">argType</A> ) ( ( "min:" &lt;UINT&gt; ( "max:" &lt;UINT&gt; )? ) | ( "max:" &lt;UINT&gt; ( "min:" &lt;UINT&gt; )? ) ) )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for global array element store bounds specifications in the
+ * EDLSuite header section.
+ *
+ * A &lt;UINT&gt; is a positive integer (whole number) value, with no
+ * leading zeros.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>array_element_store_bounds__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod7">array_element_store_bounds__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "array_element_store_bounds" ( "*" | <A HREF="#prod8">argType</A> ) ( ( "min:" &lt;UINT&gt; ( "max:" &lt;UINT&gt; )? ) | ( "max:" &lt;UINT&gt; ( "min:" &lt;UINT&gt; )? ) ) )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for "Observables" sections of an EDL specification.
+ *
+ * Refer to the documentation of the suiteDecl() production for a definition
+ * of the &lt;WILD_STRING&gt; token.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>observablesSection</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod3">observablesSection</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"begin" "Observables" ( &lt;STRING_LITERAL&gt; | &lt;WILD_STRING&gt; ) <A HREF="#prod9">preambleSection</A> ( <A HREF="#prod10">observableEvent</A> )* "end"</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for the "Preamble" section of "Observable" sections.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>preambleSection</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod9">preambleSection</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"begin" "Preamble" <A HREF="#prod11">preambleDeclarations</A> "end"</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for the declarations permitted in a "Preamble" section.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>preambleDeclarations</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod11">preambleDeclarations</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "System-classes:" ( &lt;STRING_LITERAL&gt; | &lt;WILD_STRING&gt; ) ) ( ( "Module-classes:" ( &lt;STRING_LITERAL&gt; | &lt;WILD_STRING&gt; ) ) | ( "No-module:" ( &lt;TRUE&gt; | &lt;FALSE&gt; ) ) )? ( "Database-tag:" ( &lt;STRING_LITERAL&gt; | &lt;WILD_STRING&gt; ) )? ( <A HREF="#prod12">preambleTypedef</A> )*</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for a type-alias ("Type-name:") declaration in a
+ * "Preamble" section.
+ *
+ * Expansions of type aliases can occur in the following locations:
+ *   - array element bounds event requests
+ *   - argument types in method selection expressions
+ *   - class names in event requests and method selection expressions
+ *
+ * Type aliases cannot be declared for primitive types, or associated
+ * to any reserved EDL keywords.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>preambleTypedef</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod12">preambleTypedef</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"Type-name:" <A HREF="#prod13">javaIdentifier</A> ( <A HREF="#prod14">jniReferenceType</A> | <A HREF="#prod15">qualifiedName</A> )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL event requests.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>observableEvent</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod10">observableEvent</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "+" | "-" ) <A HREF="#prod16">eventDecl</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL event type requests.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>eventDecl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod16">eventDecl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod17">new_object__decl</A> | <A HREF="#prod18">construct_object__decl</A> | <A HREF="#prod19">construct_finish__decl</A> | <A HREF="#prod20">get_static__decl</A> | <A HREF="#prod21">put_static__decl</A> | <A HREF="#prod22">get_field__decl</A> | <A HREF="#prod23">put_field__decl</A> | <A HREF="#prod24">constructor_call__decl</A> | <A HREF="#prod25">static_call__decl</A> | <A HREF="#prod26">virtual_call__decl</A> | <A HREF="#prod27">interface_call__decl</A> | <A HREF="#prod28">virtual_method_enter__decl</A> | <A HREF="#prod29">virtual_method_exit__decl</A> | <A HREF="#prod30">static_method_enter__decl</A> | <A HREF="#prod31">static_method_exit__decl</A> | <A HREF="#prod32">monitor_contend__decl</A> | <A HREF="#prod33">monitor_acquire__decl</A> | <A HREF="#prod34">monitor_pre_release__decl</A> | <A HREF="#prod35">monitor_release__decl</A> | <A HREF="#prod36">throw__decl</A> | <A HREF="#prod37">catch__decl</A> | <A HREF="#prod38">static_init_enter__decl</A> | <A HREF="#prod39">array_element_load__decl</A> | <A HREF="#prod40">array_element_store__decl</A> )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL new object allocation event requests.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>new_object__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod17">new_object__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"new_object" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL constructor entry event requests.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>construct_object__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod18">construct_object__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"construct_object" ( "*" | ( <A HREF="#prod15">qualifiedName</A> <A HREF="#prod42">argsExpr</A> ) )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL constructor exit event requests.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>construct_finish__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod19">construct_finish__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"construct_finish" ( "*" | ( <A HREF="#prod15">qualifiedName</A> <A HREF="#prod42">argsExpr</A> ) )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL static field read event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of the field is given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>get_static__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod20">get_static__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"get_static" <A HREF="#prod15">qualifiedName</A> ( ".*" )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL static field write event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of the field is given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>put_static__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod21">put_static__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"put_static" <A HREF="#prod15">qualifiedName</A> ( ".*" )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL instance field read event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of the field is given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>get_field__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod22">get_field__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"get_field" <A HREF="#prod15">qualifiedName</A> ( ".*" )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL instance field write event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of the field is given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>put_field__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod23">put_field__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"put_field" <A HREF="#prod15">qualifiedName</A> ( ".*" )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL constructor call event requests.
+ *
+ * Constructor calls correspond to the INVOKESPECIAL instruction in the JVM
+ * bytecode instruction set.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>constructor_call__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod24">constructor_call__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"constructor_call" ( "*" | ( <A HREF="#prod15">qualifiedName</A> <A HREF="#prod42">argsExpr</A> ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL static method call event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of the method is given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ *
+ * Static calls correspond to the INVOKESTATIC instruction in the JVM
+ * bytecode instruction set.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>static_call__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod25">static_call__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"static_call" ( "#INT" )? ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL virtual (non-interface) method call event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of the method is given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ *
+ * Virtual calls correspond to the INVOKEVIRTUAL instruction in the JVM
+ * bytecode instruction set.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>virtual_call__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod26">virtual_call__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"virtual_call" ( "#INT" )? ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL interface method call event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of the method is given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ *
+ * Interface calls correspond to the INVOKEINTERFACE instruction in the JVM
+ * bytecode instruction set.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>interface_call__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod27">interface_call__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"interface_call" ( "#INT" )? ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL virtual method entry event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of the method is given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ *
+ * A virtual method for the purpose of this event is any non-constructor
+ * method declared without the "static" modifier (e.g. methods dispatched
+ * by either INVOKEVIRTUAL or INVOKEINTERFACE call instructions).
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>virtual_method_enter__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod28">virtual_method_enter__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"virtual_method_enter" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL virtual method exit event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of the method is given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ *
+ * A virtual method for the purpose of this event is any non-constructor
+ * method declared without the "static" modifier (e.g. methods dispatched
+ * by either INVOKEVIRTUAL or INVOKEINTERFACE call instructions).
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>virtual_method_exit__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod29">virtual_method_exit__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"virtual_method_exit" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL static method entry event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of the method is given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ *
+ * A static method for the purpose of this event is any non-constructor
+ * method declared with the "static" modifier (e.g. methods dispatched
+ * by the INVOKESTATIC call instruction).
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>static_method_enter__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod30">static_method_enter__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"static_method_enter" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL static method exit event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of the method is given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ *
+ * A static method for the purpose of this event is any non-constructor
+ * method declared with the "static" modifier (e.g. methods dispatched
+ * by the INVOKESTATIC call instruction).
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>static_method_exit__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod31">static_method_exit__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"static_method_exit" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL monitor contend events.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>monitor_contend__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod32">monitor_contend__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"monitor_contend" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL monitor acquired events.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>monitor_acquire__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod33">monitor_acquire__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"monitor_acquire" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL monitor pending release events.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>monitor_pre_release__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod34">monitor_pre_release__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"monitor_pre_release" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL monitor released events.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>monitor_release__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod35">monitor_release__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"monitor_release" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL exception raised events.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>throw__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod36">throw__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"throw" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( "+s" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL exception caught events.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>catch__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod37">catch__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"catch" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( "+s" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL static initializer entry event requests.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>static_init_enter__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod38">static_init_enter__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"static_init_enter" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL array element read event requests.
+ *
+ * A &lt;UINT&gt; is a positive integer (whole number) value, with no
+ * leading zeros.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>array_element_load__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod39">array_element_load__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"array_element_load" ( "*" | <A HREF="#prod8">argType</A> ) ( "min:" &lt;UINT&gt; )? ( "max:" &lt;UINT&gt; )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL array element write event requests.
+ *
+ * A &lt;UINT&gt; is a positive integer (whole number) value, with no
+ * leading zeros.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>array_element_store__decl</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod40">array_element_store__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"array_element_store" ( "*" | <A HREF="#prod8">argType</A> ) ( "min:" &lt;UINT&gt; )? ( "max:" &lt;UINT&gt; )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for EDL location constraint blocks for event requests.
+ *
+ * Because of greedy token matching in the qualifiedName() subrule,
+ * the expectation that the name of a method may be given as the string
+ * after the final "." in the qualified name string is not formally
+ * encoded by the grammar, except in the case of wildcard requests.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>locationBlock</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod41">locationBlock</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"{" ( ( "in" | "not" ) ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) ) )* "}"</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for method argument expressions used in method selection
+ * expressions (e.g. for specifying method signatures for matching
+ * methods).
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>argsExpr</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod42">argsExpr</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "*" | <A HREF="#prod43">voidArg</A> | ( <A HREF="#prod8">argType</A> ( "," <A HREF="#prod8">argType</A> )* ) | <A HREF="#prod44">jniMethodSignature</A> )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for the "void" argument type.
+ *
+ * The void argument type is really a placeholder expression to express
+ * a specific match only with a method taking no arguments. It cannot
+ * be combined with any other argument types, thus a separate production.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>voidArg</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod43">voidArg</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "void" | "V" )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for an argument type declaration.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>argType</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod8">argType</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod45">basicTypeName</A> | <A HREF="#prod46">jniPrimitiveType</A> | ( <A HREF="#prod47">jniObjectType</A> | <A HREF="#prod48">jniArrayType</A> | <A HREF="#prod15">qualifiedName</A> ) )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for basic type names, provided by EDL for
+ * convenience/readability.
+ *
+ * Note that "string" corresponds internally to "java.lang.String".
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>basicTypeName</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod45">basicTypeName</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "byte" | "char" | "double" | "float" | "int" | "long" | "boolean" | "short" | "string" )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for JNI format primitive type codes.
+ *
+ * The type code for <code>void</code> ("V") is omitted for the reason
+ * described in the voidArg() production.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>jniPrimitiveType</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod46">jniPrimitiveType</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "B" | "C" | "D" | "F" | "I" | "J" | "Z" | "S" )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Union production for all reference type declarations in JNI format
+ * (object and array types).
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>jniReferenceType</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod14">jniReferenceType</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod48">jniArrayType</A> | <A HREF="#prod47">jniObjectType</A> )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for array type declarations in JNI format.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>jniArrayType</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod48">jniArrayType</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "[" )+ ( <A HREF="#prod46">jniPrimitiveType</A> | <A HREF="#prod47">jniObjectType</A> )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for object type declarations in JNI format.
+ *
+ * The expected "L" prefix is not explicitly enforced by the grammar
+ * because of the difficulty in differentiating it from an
+ * identifier in the lexer, due to the "maximal munch" rule.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>jniObjectType</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod47">jniObjectType</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod13">javaIdentifier</A> ( "/" <A HREF="#prod13">javaIdentifier</A> )* ";"</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for a method signature declaration in JNI format.
+ *
+ * The formal specification for the JNI method signature format is as
+ * follows:
+ *
+ * "(" ( jniObjectType() | jniArrayType() | jniPrimitiveType() )* ")"
+ *     ( jniObjectType() | jniArrayType() | jniPrimitiveType() | "V" )
+ *
+ * Due to the considerable complexity in both lexer and parser of
+ * disambiguating the various token types and subrules, particularly
+ * in the presence of the additional shorthand notations provided by
+ * EDL, this production accepts essentially freeform inputs consisting
+ * of the characters that may legally appear in a JNI signature. The
+ * task of validating the signature is deferred (normally to BCEL).
+ *
+ * At the current time, EDL ignores the return type component of the
+ * signature. It is accepted, however, to reduce the burden for
+ * tools that might mechanically generate EDL and would likely want
+ * to generate signatures in their full, standard format.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>jniMethodSignature</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod44">jniMethodSignature</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"(" ( <A HREF="#prod13">javaIdentifier</A> | "[" | "/" | ";" )* ")" ( <A HREF="#prod13">javaIdentifier</A> | "V" | "[" | "/" | ";" )+</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for a package-qualified Java class (type) name.
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>qualifiedName</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod15">qualifiedName</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod13">javaIdentifier</A> ( "." <A HREF="#prod13">javaIdentifier</A> )* )</TD>
+</TR>
+</TABLE>
+<HR>
+<PRE>
+/**
+ * Production for a basic (unqualified) Java identifier.
+ *
+ * To improve the efficiency of the parser, the productions
+ * basicTypeName() and jniPrimitiveType() are defined. These productions
+ * induce distinct token types that take precedence in the lexer over the
+ * Java identifier token matching in some contexts. However, they are
+ * (at least theoretically) still legal Java identifiers (or constituents
+ * of a package name, for which the production is defined in terms
+ * of Java identifiers). To ensure that EDL accepts them as Java
+ * identifiers in productions that do not involve basicTypeName() and/or
+ * jniPrimitiveType() subrules, this production must be provided and
+ * used.
+ * 
+ * In cases where combinations of the ambiguous productions are
+ * permitted, syntactic lookead is used to resolve in favor of the
+ * more specialized productions (basicTypeName(), jniPrimitiveType()).
+ */</PRE>
+
+<TABLE ALIGN=CENTER>
+<CAPTION><STRONG>javaIdentifier</STRONG></CAPTION>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod13">javaIdentifier</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "string" | "B" | "C" | "D" | "F" | "I" | "J" | "Z" | "S" | &lt;JAVA_ID&gt; )</TD>
+</TR>
+</TABLE>
+<HR>
+</BODY>
+</HTML>

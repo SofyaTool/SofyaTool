@@ -1,0 +1,264 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Sofya User Manual: Event Dispatch: Structural</title>
+<style type="text/css">
+P.i1 { margin-left:2em }
+P.i2 { margin-left:4em }
+</style>
+</head>
+
+<body>
+
+<h2 style="text-align:center">Using the structural event dispatch framework</h2>
+
+<div><a name="cfInst"></a></div>
+<h3>Running the Instrumentor</h3>
+
+<h4>Getting Started</h4>
+<p><b>Notice:</b> The sofya tools currently have a bug that requires the use
+of the <i>[-tag tag]</i> option when using the instrumentation and execution
+tracing tools described here.</p>
+<p>To run the instrumentor to instrument a class for structural event dispatch,
+use the following command:</p>
+
+<p><code>java sofya.ed.cfInstrumentor [-tag <i>tag</i>] &lt;-&lt;E|X|C|B&gt;|-branch&gt;
+&lt;classname|jarfile|listfile&gt; [classname|jarfile ...] </code></p>
+
+<p>The <code>tag</code> parameter can be used to specify a database tag associated
+with the control flow and map files required by the instrumentor
+(see information on the <a href="graphs.html#cfg">CFG builder</a>). If you did
+not specify a tag to the CFG builder when constructing the control flow graphs
+for the classes you intend to instrument, you do not need to use this
+parameter.</p>
+
+<p>The first required parameter specifies either basic block instrumentation or branch
+instrumentation. To instrument basic blocks, any combination of the characters E, X, C, and B
+can be specified, where E specifies virtual <em>entry</em> blocks, X specifies virtual
+<em>exit</em> blocks, C specifies call blocks, and B specifies all other basic blocks. Entry
+and exit blocks do not correspond to actual code, but rather provide information about entry
+to and exit from methods. Branch instrumentation is not parameterized, though branch
+types can be filtered at runtime (this is discussed under
+<a href="#dispatch">running the event dispatcher</a>).
+
+<p>When specifying a single class for instrumentation, the rules regarding inclusion of the
+<em>.class</em> extension are the same as for the <a href="graphs.html#cfg">CFG builder</a>.
+However, the instrumentor exhibits  additional behaviors with respect to
+the format of the class name. If an absolute path is given, the instrumentation
+will be directly applied to the given classfile, at the classfile's current location.
+If the class is loaded from the classpath, the resulting instrumented classfile will
+be placed in the working directory from which the instrumentor is run.</p>
+
+<p>The instrumentor also accepts jar files and program list files to specify the classes
+to be instrumented. Program list files are automatically found in the database, using
+the tag if one is specified. Any necessary path information
+should be provided when passing a jar file as an argument. When a jar file is passed
+as an argument on the command line, every class in the jar is instrumented.
+The preferred way to include classes in a jar file is to include the jar file
+in a program list file and supply the program list file as an argument instead, as a
+program list file permits you to exclude classes in the jar from processing. Any number
+of specific classes, jar files, and program list files can be passed to the instrumentor,
+though supplying a single program list file is the expected typical use.</p>
+
+<p>It should be noted that if you change the type of instrumentation, you should also remove
+the bootstrap.jar file that is created during the trace generation phase by the event
+dispatcher framework.  See the notes within the <code>StructuralInstrumentor</code> for
+additional details.</p>
+<h4>Advanced Instrumentation</h4>
+
+<p>Running the instrumentor as described in <em>Getting Started</em> instruments
+class files for observation of basic block coverage events. The full
+usage for the instrumentor is the following:</p>
+
+<p><code>java sofya.ed.cfInstrumentor [-tag <i>tag</i>] &lt;-&lt;B|E|X|C&gt;|-branch&gt; [-t
+&lt;norm|junit|seq&gt;[,junit]] [-port <i>port</i>] [-so] &lt;classname|jarfile|listfile&gt;
+[classname|jarfile ...]</code></p>
+
+<p>The <code>-t</code> parameter is used to change the inserted instrumentation
+to target different mechanisms for observing events. Currently,
+the following values for this parameter are available:</p>
+<div>
+<ul>
+<li><code>norm</code>: The default, this instrumentation supports dispatch of
+coverage event streams. Sequence event streams cannot be dispatched using
+this instrumentation.
+<li><code>seq</code>: This instrumentation enables dispatch of sequence event
+streams. Coverage event streams can also be collected, but less efficiently.
+<li><code>junit</code>: This instrumentation enables dispatch of event streams through
+the <code>JUnit</code> framework during execution of a <code>JUnit</code> test
+suite. Event streams can be dispatched from classes containing this instrumentation
+only by using the <code>junit.textui.SelectiveTestRunner</code>; regular
+event dispatchers will not operate on this instrumentation. This value is actually
+a modifier that can be combined with <code>norm</code> or <code>seq</code> to
+allow dispatch of either of those respective types of event streams from the
+execution of a <code>JUnit</code> test suite. When used alone, <code>junit</code>
+is equivalent to <code>norm,junit</code>, enabling dispatch of coverage event
+streams from JUnit tests.
+</ul>
+</div>
+
+<p>If the event dispatcher reports an error about being unable to bind to a socket,
+the <code>-port</code> parameter can be used to change the socket used by the
+instrumentation. If you specify a custom port during instrumentation, you must
+specify the same port to the event dispatcher when you run the instrumented class.</p>
+
+<p>The <code>-so</code> parameter is used to instruct the instrumentor to only insert
+into a class the instrumentation necessary to establish the connection between a
+subject and the event dispatcher. If you want to instrument certain classes, but
+not the class that is the entry point for the application, you will want
+to use this option on the class that is the entry point (the class containing the
+<code>main</code> method). This is most often useful for test driver classes that
+execute instrumented classes, but that are themselves not of interest for
+instrumentation or event dispatch.</p>
+
+<a name="dispatch"></a>
+<h3>Running the Event Dispatcher</h3>
+
+<p>The principle class for dispatching structural event streams is the
+<code>ProgramEventDispatcher</code>. This class is not directly executable,
+however the &quot;tracer&quot; classes in the <code>ed</code> package of
+&#931;&#959;&#966;&#943;&#945; are classes that generate trace files using the
+<code>ProgramEventDispatcher</code>. For structural tracing, these consist of
+<code>BBTracer</code> (basic block coverage traces),
+<code>BBSequenceTracer</code> (basic block sequence traces),
+<code>BranchTracer</code> (branch coverage traces),
+and <code>BranchSequenceTracer</code> (branch sequence traces). These classes
+serve as example implementations using the structural event dispatcher,
+and, with the assistance of the <code>TraceHandler</code>, can be used without
+modification to create trace-based analyses.</p>
+
+<h4>Getting Started</h4>
+
+<div><a name="BBTr"></a></div>
+<p>To use <code>BBTracer</code> to collect a basic block coverage
+trace of the execution of an instrumented program, make sure the main class
+of the program can be found on your Java classpath. Then run the
+following command:</p>
+
+<p><code>java sofya.ed.BBTracer -&lt;E|X|C|B&gt; &lt;classname&gt;</code>
+<code>&lt;arguments&gt;</code></p>
+
+<p>The first parameter functions the same way as described for the instrumentor,
+where any combination of the given values can be specified. Only blocks of the
+selected types will be included in the generated trace file, where E specifies
+virtual <em>entry</em> blocks, X specifies virtual <em>exit</em> blocks, C
+specifies call blocks, and B specifies all other basic blocks. For performance
+reasons, the typical usage is to trace all of the block types for which
+instrumentation was inserted. However, this filtering capability provides the
+opportunity to instrument a program for multiple types of blocks and then select
+only the block types of interest to a particular analysis when collecting traces.
+Note that if a block type is requested that was not specified during
+instrumentation, information about those blocks will <em>not</em> appear
+in the generated trace.</p>
+
+<p>The <code>classname</code> argument should be the fully qualified name of
+the main class for the program, and should <em>not</em> include the
+<em>.class</em> extension.</p>
+
+<p>By default, the tracer will create a file named &quot;instout.tr&quot; in the
+database directory which contains the trace information. Each time the tracer
+is run it will overwrite this file, unless otherwise specified (see below),
+so it is the responsibility of the user to store the file somewhere permanent,
+if desired. The trace file can be viewed using the
+<a href="viewers.html#TraceViewer">TraceViewer</a>.</p>
+<div><a name="BranchTr"></a></div>
+<p>
+The basic usage for the other tracers is essentially the same. In the case of the
+branch tracers, the branch types that can be selected are as follows:</p>
+<div>
+<ul>
+<li>I: Branches originating at &quot;<code>if</code>&quot; instructions.</li>
+<li>S: Branches originating at &quot;<code>switch</code>&quot; instructions.</li>
+<li>T: Branches representing control flow possibilities out of
+&quot;<code>throws</code>&quot; instructions, if any.</li>
+<li>C: Branches representing control flow possibilities out of call
+instructions (caused by exceptional control flow), if any.</li>
+<li>E: The &quot;entry&quot; branch into a method. Not really a branch, but
+useful to some analyses.</li>
+<li>O: Branches representing control flow possibilities caused by any
+other exceptional control flow that cannot be statically determined
+(e.g. exit from a method caused by undeclared and unhandled unchecked
+exceptions).</li>
+</ul>
+</div>
+<p>As with the basic block tracers, these options can be combined in any way.</p>
+
+<h4>Advanced Tracing</h4>
+
+<p>There are additional options available for controlling the behavior of
+the various tracers. The <code>BBTracer</code> and <code>BBSequenceTracer</code>
+classes will be used to describe these options. The same options apply
+to the <code>BranchTracer</code> and <code>BranchSequenceTracer</code>.</p>
+
+<h5>BBTracer and BranchTracer</h5>
+
+<p>The full usage for <code>BBTracer</code> is the following:</p>
+<div>
+<code>java sofya.ed.BBTracer [-port <i>n</i>] [-cp <i>path</i>]
+ [-i] [-tl <i>num_secs</i>] [-at] [-o <i>output_file</i>] [-trname <i>trace_name</i>]
+ -&lt;E|X|C|B&gt; &lt;classfileName&gt; &lt;arguments&gt;</code>
+</div>
+<p class="i1"><code>-port <i>n</i></code></p>
+<p class="i2">Instructs the tracer to listen for the instrumentation
+connection on port number <i>n</i>.</p>
+<p class="i1"><code>-cp <i>path</i></code></p>
+<p class="i2">Causes the tracer to set the CLASSPATH for the subject
+program to <i>path</i>.</p>
+<p class="i1"><code>-i</code></p>
+<p class="i2">Enables piping of <code>stdin</code> to the subject
+program. Programs requiring user input will deadlock if this option is not enabled.</p>
+<p class="i1"><code>-tl <i>num_secs</i></code></p>
+<p class="i2">Instructs the tracer to kill the subject after
+<i>num_secs</i> if it has not yet terminated. This option should be used instead
+of sending a kill signal to the tracer, as it enables the tracer to perform cleanup
+and generate the trace file for the subject program up to the point it was terminated.</p>
+<p class="i1"><code>-at</code></p>
+<p class="i2">Causes the tracer to append the current trace to the
+existing trace file of the same name, if it already exists.</p>
+<p class="i1"><code>-trname <i>trace_name</i></code></p>
+<p class="i2">Instructs the tracer to name the trace file
+<i>trace_name</i>. The <em>.tr</em> extension should be omitted.</p>
+<p class="i1"><code>-o <i>output_file</i></code></p>
+<p class="i2">Causes the tracer to redirect the subject program's output
+to <i>output_file</i>. Both <code>stdout</code> and <code>stderr</code> are redirected
+to the specified file.</p>
+<p class="i1"><code>-&lt;B|E|X|C&gt;</code></p>
+<p class="i2">Specifies the block types to be included in the generated
+trace. All permutations are allowed.</p>
+<p>
+An explaination of branch tracing report output resulting from using
+<code>sofya.ed.BranchTracer</code> can be found in the
+<a href="Sofya-BranchTrace.html">Branch Tracing Interpretation</a>
+section of the manual.
+</p>
+<h5>BBSequenceTracer and BranchSequenceTracer</h5>
+
+<p>The sequence tracers are used to collect traces recording the full sequence
+of program entities executed during a program run, in the order observed. A program
+must be instrumented for sequence tracing to use this tracer; a program instrumented
+for coverage tracing will not work. This tracer produces a trace file in
+the database directory named &quot;instout.seq&quot; that is readable without
+the use of a viewer. These tracers provide the following additional options:</p>
+
+<p class="i1"><code>-pre <i>data</i></code></p>
+<p class="i2">Causes the tracer to insert <i>data</i> at the start
+of the trace file, before any trace data.</p>
+<p class="i1"><code>-post <i>data</i></code></p>
+<p class="i2">Causes the tracer to append <i>data</i> at the end
+of the trace file, after any trace data.</p>
+<p class="i1"><code>-relay</code></p>
+<p class="i2">Instructs the tracer to transmit the trace
+(including any <code>-pre</code> or <code>-post</code> data) through a socket
+to the port used by a DAG builder to perform dynamic impact analysis.</p>
+<p>
+Note that by default the <code>BBSequenceTracer</code> writes <em>entry</em>
+and <em>exit</em> block events to the trace file in a format specifically
+designed for use in a particular type of DAG construction for impact
+analysis. New filters can be written to generate trace files in other
+formats. Finally, be aware that the trace files generated by this tracer can
+be extremely large.</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

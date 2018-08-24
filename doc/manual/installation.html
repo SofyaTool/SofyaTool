@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Installing &#931;&#959;&#966;&#943;&#945;</title>
+</head>
+<body style="background-color:#FFFFFF">
+<h1 style="text-align:center">Installation Instructions</h1>
+
+<p>Use of &#931;&#959;&#966;&#943;&#945; is governed by the
+<a href="../../LICENSE-1.0">University of Nebraska Open Academic License</a>.
+You must read and accept all of the terms and conditions of this license prior
+to downloading, installing and/or using the software.
+</p>
+<p>The current version of &#931;&#959;&#966;&#943;&#945; can be downloaded here:
+<a href="http://cse.unl.edu/~galileo/ltd-tools">SIR Tools</a>
+</p>
+<p>The &#931;&#959;&#966;&#943;&#945; Java analysis system is written entirely in Java,
+so it is theoretically possible to install and run the system on any architecture
+for which the Java2 SDK/JRE version 1.5 or greater is available. The system has
+been extensively tested on Solaris (SunOS), SuSE Linux 9.1, and to a lesser extent on
+Red Hat Linux 9.0, Fedora Core 4, Gentoo 2006.0, and Windows 2000/XP.
+Most recently, we have had some success running &#931;&#959;&#966;&#943;&#945;
+on Java 1.7, but complete compatibility is not guaranteed due to continuing
+changes to the JVM and class file header formats.<p>
+
+<p>This software requires a library called BCEL which can be downloaded
+
+<a href="http://sofya.unl.edu/files/bcel-5.2.tar.gz">here</a>.  Earlier versions of
+<!-- <a href="../../files/bcel-5.2.tar.gz">here</a>.  Earlier versions of -->
+&#931;&#959;&#966;&#943;&#945; were not packaged with this library included
+however the latest &#931;&#959;&#966;&#943;&#945; version (2.1.7) uses BCEL
+6.0 which is included within the  &#931;&#959;&#966;&#943;&#945; package,
+or the jar can be downloaded <a href="../../files/bcel-6.0.jar">here.</a>.
+</p>
+<p>Do the following to install &#931;&#959;&#966;&#943;&#945;.</p>
+
+<h3>Install &#931;&#959;&#966;&#943;&#945;</h3>
+<ol>
+   <li>Choose where to extract the &#931;&#959;&#966;&#943;&#945; system. On extraction,
+       a directory called "sofya" will be created in this location.</li>
+   <li>Unzip the package using gunzip: <code>gunzip sofya.tar.gz</code></li>
+   <li>Extract the resulting archive: <code>tar -xvf sofya.tar</code></li>
+   <li>Alternatively, you can do the unzip and extract in a single command:
+       <code>tar --gunzip -xvf sofya.tar.gz</code></li>
+   <li>All the files should be extracted into subdirectories in the &quot;sofya&quot; directory. This directory
+       is the root directory for the entire  &#931;&#959;&#966;&#943;&#945; system.</li>
+   <li>Create a directory named &quot;.sofyadb&quot; in your home directory. This will act as the database
+       for &#931;&#959;&#966;&#943;&#945;, where it will store most of its outputs.</li>
+   <li>Add the location of &#931;&#959;&#966;&#943;&#945; to your Java classpath. Suppose you
+       extracted &#931;&#959;&#966;&#943;&#945; into a directory named &quot;tools&quot; in your
+       home directory. Then you would execute the following command (in csh/tcsh):
+       <p><code>setenv CLASSPATH &quot;${CLASSPATH}&quot;:${HOME}/tools/sofya/sofya.jar</code></p>
+       You may prefer to add this to your classpath in your shell's startup script.</li>
+   <li>Add the supporting libraries required by  &#931;&#959;&#966;&#943;&#945; to your classpath:
+       <p><code>setenv CLASSPATH &quot;${CLASSPATH}&quot;:${HOME}/tools/sofya/lib/commons-collections.jar:${HOME}/tools/sofya/lib/trove/lib/trove.jar:${HOME}/tools/sofya/lib/bcel-6.0.jar</code>
+       </p></li>
+</ol>
+<h3>Install BCEL</h3>
+<p>If you have downloaded version Sofya 2.1.7, the bcel 6.0 beta version is provided within
+the <i>sofya/lib</i> directory.</p>
+<ol>
+<li>Include the <b>sofya/lib/bcel-6.0.jar</b> file on you classpath, assuming that you unzipped sofya into your ${HOME}/tools directory (in csh/tcsh):
+<p><code>setenv CLASSPATH &quot;${CLASSPATH}&quot;:${HOME}/tools/sofya/lib/bcel-6.0.jar</code></p></li>
+</ol>
+<p>If you have downloaded an earlier Sofya version (prior to version 2.1.7) follow these steps:</p>
+<ol>
+  <li>Choose where to extract the BCEL system</li>
+  <li>Unzip the package using gunzip: <code>gunzip bcel-5.2.tar.gz</code></li>
+  <li>Extract the resulting archive: <code>tar -xvf bcel-5.2.tar</code></li>
+  <li>Alternatively, you can unzip and extract by the single command:
+      <code>tar --gunzip -xvf bcel-5.2.tar.gz</code></li>
+  <li>All the files should be extracted into subdirectories in the &quot;bcel-5.2&quot; directory.
+      This directory is the root directory for the BCEL library.</li>
+  <li>Add the location of the BCEL library to your Java classpath. Suppose you extracted BCEL
+      into your home directory. Then you would execute the following command (in csh/tcsh):
+      <p><code>setenv CLASSPATH &quot;${CLASSPATH}&quot;:${HOME}/bcel-5.2/bcel-5.2.jar</code></p>
+      If you instead downloaded the BCEL 6.0 jar, you would put it on your
+      Java classpath, replacing the ${HOME}/bcel-5.2/bcel-5.2.jar portion
+      with the path to where you placed the BCEL 6.0 jar.
+      You may prefer to add this to your classpath in your shell's startup script.</li>
+</ol>
+<hr>
+<p>Page last updated by Wayne Motycka: 10/21/2016</p>
+</body>
+</html>

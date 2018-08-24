@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Sofya User Manual: Event Dispatch: Overview</title>
+</head>
+<body>
+
+<h2 style="text-align:center">&#931;&#959;&#966;&#943;&#945; event dispatch framework overview</h2>
+
+<p>The event dispatch components are the core of &#931;&#959;&#966;&#943;&#945;;
+these are the tools that actually provide for the processing and capture of
+events observed in running Java programs. &#931;&#959;&#966;&#943;&#945; provides
+various classes that use the event dispatch framework to record trace files of
+the events observed during program runs. These classes can serve both as a basis
+for a variety of interesting trace-based analyses and as basic examples of how to
+use the framework programmatically. The user manual will focus on how to use the
+classes for trace file collection that are provided by
+&#931;&#959;&#966;&#943;&#945;.</p>
+<!-- Extend this paragraph to reference implementation docs once they get
+updated. -->
+
+<p>&#931;&#959;&#966;&#943;&#945;'s event dispatch framework is logically composed of
+two major sub-packages to dispatch different types of event streams. The first type
+of event stream is a semantic event stream. Informally, &#931;&#959;&#966;&#943;&#945;
+semantic events are considered to be those events that communicate information
+that is sensitive to the meaning of the program as it impacts data state or control
+dependence. Examples of such events are field reads and writes, and lock operations.
+The second type of event stream is a structural event stream. This is an event
+stream that communicates information about the execution of program code entities,
+such as basic blocks and branch decisions. A familiar application of such event
+streams is to measure program coverage. We provide a detailed discussion of the usage
+of &#931;&#959;&#966;&#943;&#945; provided instrumentation and trace collection classes
+for each of these types of event streams.</p>
+
+<ul>
+  <li><a href="ed-semantic.html">Semantic event dispatch</a></li>
+  <li><a href="ed-structural.html">Structural event dispatch</a></li>
+</ul>
+<p>
+Further information on the event dispatch framework of &#931;&#959;&#966;&#943;&#945;
+and the event dispatcher language (EDL) can be found in the <a href="../../tr20060006.pdf">
+technical report</a>.
+<p>&nbsp;</p>
+</body>
+</html>

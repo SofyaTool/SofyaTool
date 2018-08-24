@@ -1,0 +1,253 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML>
+<HEAD>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<TITLE>BNF for edl.jj</TITLE>
+</HEAD>
+<BODY>
+<H1 ALIGN=CENTER>BNF for edl.jj</H1>
+<H2 ALIGN=CENTER>NON-TERMINALS</H2>
+<TABLE>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod1">edlUnit</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod2">suiteDecl</A> ( <A HREF="#prod3">observablesSection</A> | <A HREF="#prod4">importDecl</A> )+ &lt;EOF&gt; )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod4">importDecl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"@import" &lt;STRING_LITERAL&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod5">importEdlUnit</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod3">observablesSection</A> | <A HREF="#prod4">importDecl</A> )+ &lt;EOF&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod2">suiteDecl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"begin" "EDLSuite" ( &lt;STRING_LITERAL&gt; | &lt;WILD_STRING&gt; ) ( <A HREF="#prod6">array_element_load_bounds__decl</A> | <A HREF="#prod7">array_element_store_bounds__decl</A> )* "end"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod6">array_element_load_bounds__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "array_element_load_bounds" ( "*" | <A HREF="#prod8">argType</A> ) ( ( "min:" &lt;UINT&gt; ( "max:" &lt;UINT&gt; )? ) | ( "max:" &lt;UINT&gt; ( "min:" &lt;UINT&gt; )? ) ) )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod7">array_element_store_bounds__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "array_element_store_bounds" ( "*" | <A HREF="#prod8">argType</A> ) ( ( "min:" &lt;UINT&gt; ( "max:" &lt;UINT&gt; )? ) | ( "max:" &lt;UINT&gt; ( "min:" &lt;UINT&gt; )? ) ) )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod3">observablesSection</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"begin" "Observables" ( &lt;STRING_LITERAL&gt; | &lt;WILD_STRING&gt; ) <A HREF="#prod9">preambleSection</A> ( <A HREF="#prod10">observableEvent</A> )* "end"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod9">preambleSection</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"begin" "Preamble" <A HREF="#prod11">preambleDeclarations</A> "end"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod11">preambleDeclarations</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "System-classes:" ( &lt;STRING_LITERAL&gt; | &lt;WILD_STRING&gt; ) ) ( ( "Module-classes:" ( &lt;STRING_LITERAL&gt; | &lt;WILD_STRING&gt; ) ) | ( "No-module:" ( &lt;TRUE&gt; | &lt;FALSE&gt; ) ) )? ( "Database-tag:" ( &lt;STRING_LITERAL&gt; | &lt;WILD_STRING&gt; ) )? ( <A HREF="#prod12">preambleTypedef</A> )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod12">preambleTypedef</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"Type-name:" <A HREF="#prod13">javaIdentifier</A> ( <A HREF="#prod14">jniReferenceType</A> | <A HREF="#prod15">qualifiedName</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod10">observableEvent</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "+" | "-" ) <A HREF="#prod16">eventDecl</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod16">eventDecl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod17">new_object__decl</A> | <A HREF="#prod18">construct_object__decl</A> | <A HREF="#prod19">construct_finish__decl</A> | <A HREF="#prod20">get_static__decl</A> | <A HREF="#prod21">put_static__decl</A> | <A HREF="#prod22">get_field__decl</A> | <A HREF="#prod23">put_field__decl</A> | <A HREF="#prod24">constructor_call__decl</A> | <A HREF="#prod25">static_call__decl</A> | <A HREF="#prod26">virtual_call__decl</A> | <A HREF="#prod27">interface_call__decl</A> | <A HREF="#prod28">virtual_method_enter__decl</A> | <A HREF="#prod29">virtual_method_exit__decl</A> | <A HREF="#prod30">static_method_enter__decl</A> | <A HREF="#prod31">static_method_exit__decl</A> | <A HREF="#prod32">monitor_contend__decl</A> | <A HREF="#prod33">monitor_acquire__decl</A> | <A HREF="#prod34">monitor_pre_release__decl</A> | <A HREF="#prod35">monitor_release__decl</A> | <A HREF="#prod36">throw__decl</A> | <A HREF="#prod37">catch__decl</A> | <A HREF="#prod38">static_init_enter__decl</A> | <A HREF="#prod39">array_element_load__decl</A> | <A HREF="#prod40">array_element_store__decl</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod17">new_object__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"new_object" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod18">construct_object__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"construct_object" ( "*" | ( <A HREF="#prod15">qualifiedName</A> <A HREF="#prod42">argsExpr</A> ) )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod19">construct_finish__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"construct_finish" ( "*" | ( <A HREF="#prod15">qualifiedName</A> <A HREF="#prod42">argsExpr</A> ) )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod20">get_static__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"get_static" <A HREF="#prod15">qualifiedName</A> ( ".*" )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod21">put_static__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"put_static" <A HREF="#prod15">qualifiedName</A> ( ".*" )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod22">get_field__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"get_field" <A HREF="#prod15">qualifiedName</A> ( ".*" )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod23">put_field__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"put_field" <A HREF="#prod15">qualifiedName</A> ( ".*" )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod24">constructor_call__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"constructor_call" ( "*" | ( <A HREF="#prod15">qualifiedName</A> <A HREF="#prod42">argsExpr</A> ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod25">static_call__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"static_call" ( "#INT" )? ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod26">virtual_call__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"virtual_call" ( "#INT" )? ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod27">interface_call__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"interface_call" ( "#INT" )? ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod28">virtual_method_enter__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"virtual_method_enter" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod29">virtual_method_exit__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"virtual_method_exit" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod30">static_method_enter__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"static_method_enter" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod31">static_method_exit__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"static_method_exit" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod32">monitor_contend__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"monitor_contend" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod33">monitor_acquire__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"monitor_acquire" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod34">monitor_pre_release__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"monitor_pre_release" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod35">monitor_release__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"monitor_release" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod36">throw__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"throw" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( "+s" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod37">catch__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"catch" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( "+s" )? ) ) <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod38">static_init_enter__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"static_init_enter" ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ".*" )? ) )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod39">array_element_load__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"array_element_load" ( "*" | <A HREF="#prod8">argType</A> ) ( "min:" &lt;UINT&gt; )? ( "max:" &lt;UINT&gt; )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod40">array_element_store__decl</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"array_element_store" ( "*" | <A HREF="#prod8">argType</A> ) ( "min:" &lt;UINT&gt; )? ( "max:" &lt;UINT&gt; )? <A HREF="#prod41">locationBlock</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod41">locationBlock</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"{" ( ( "in" | "not" ) ( "*" | ( <A HREF="#prod15">qualifiedName</A> ( ( ".*" ) | <A HREF="#prod42">argsExpr</A> ) ) ) )* "}"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod42">argsExpr</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "*" | <A HREF="#prod43">voidArg</A> | ( <A HREF="#prod8">argType</A> ( "," <A HREF="#prod8">argType</A> )* ) | <A HREF="#prod44">jniMethodSignature</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod43">voidArg</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "void" | "V" )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod8">argType</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod45">basicTypeName</A> | <A HREF="#prod46">jniPrimitiveType</A> | ( <A HREF="#prod47">jniObjectType</A> | <A HREF="#prod48">jniArrayType</A> | <A HREF="#prod15">qualifiedName</A> ) )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod45">basicTypeName</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "byte" | "char" | "double" | "float" | "int" | "long" | "boolean" | "short" | "string" )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod46">jniPrimitiveType</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "B" | "C" | "D" | "F" | "I" | "J" | "Z" | "S" )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod14">jniReferenceType</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod48">jniArrayType</A> | <A HREF="#prod47">jniObjectType</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod48">jniArrayType</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "[" )+ ( <A HREF="#prod46">jniPrimitiveType</A> | <A HREF="#prod47">jniObjectType</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod47">jniObjectType</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod13">javaIdentifier</A> ( "/" <A HREF="#prod13">javaIdentifier</A> )* ";"</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod44">jniMethodSignature</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>"(" ( <A HREF="#prod13">javaIdentifier</A> | "[" | "/" | ";" )* ")" ( <A HREF="#prod13">javaIdentifier</A> | "V" | "[" | "/" | ";" )+</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod15">qualifiedName</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod13">javaIdentifier</A> ( "." <A HREF="#prod13">javaIdentifier</A> )* )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod13">javaIdentifier</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( "string" | "B" | "C" | "D" | "F" | "I" | "J" | "Z" | "S" | &lt;JAVA_ID&gt; )</TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>

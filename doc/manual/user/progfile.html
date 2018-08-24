@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Sofya User Manual: Creating a Program List File</title>
+</head>
+<body>
+
+<h2 style="text-align:center">Creating a &#931;&#959;&#966;&#943;&#945; Program List File</h2>
+
+<p>A &quot;program list&quot; file specifies a set of related Java classes; commonly
+this is the set of classes that logically comprise an entire program under analysis.
+These files are required by some &#931;&#959;&#966;&#943;&#945; tools to perform
+actions and analyses that require access to information about multiple classes at
+the same time. They also serve as means for conveniently identifying many classes
+on which to operate, even when a tool is capable of working on a single class.</p>
+
+<p>A program list file consists of one or more records, specifying a location and
+a bracketed list of Java classes. A location is either a directory or a jar file
+containing the classes named in the list. Each class in a list is specified in
+fully package-qualified dotted notation, and must appear on a separate line.
+If the specified location is a directory, the classes in the list are classes
+to be <em>included</em>. If the location is a jar file, the classes listed are to
+be <em>excluded</em>.</p>
+
+<p>The following is an example program list file:</p>
+
+<pre>
+/home/akinneer/java/subject {
+    org.tool.Main
+    org.tool.impl.Controller
+    org.tool.impl.DefaultAlgorithm
+    org.tool.impl.FastAlgorithm
+}
+home/akinneer/java/subject/support.jar {
+    org.util.Misc
+}
+</pre>
+
+<p>This program list file informs a &#931;&#959;&#966;&#943;&#945; tool that it
+is to operate on the four classes found in the directory
+'/home/akinneer/java/subject', and on all classes in the jar file
+'/home/akinneer/java/subject/support.jar' except 'org.util.Misc'.</p>
+
+<p>Classes are found and loaded by resolving the package-qualified name against
+the location, in the same manner that classes are resolved against a classpath.
+However, the class list is always fully processed in sequential order, so
+it is possible to specify multiple classes with the same name in different
+packages.</p>
+
+<p>A program list file must have the extension '.prog.lst', and be placed in
+the &#931;&#959;&#966;&#943;&#945; database directory, which is normally a
+directory named '.sofyadb' in your home directory. If a program list file is
+to be associated with a database tag, you must create a subdirectory with the
+same name as the desired tag in the database directory, and place the program
+list file in that subdirectory. In the future, we intend to provide tools to
+assist in creating and properly storing program list files.</p>
+
+<p>A program list file should be specified with only the '.prog' portion of
+the extension whenever it is passed as an argument to a
+&#931;&#959;&#966;&#943;&#945; tool. For example, if you have created the
+file 'system.prog.lst' in the &#931;&#959;&#966;&#943;&#945; database, you
+should specify it as 'system.prog' when used as an argument to a tool.</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

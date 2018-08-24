@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Sofya User Manual: Tools</title>
+<style type="text/css">
+P.i1 { margin-left:2em }
+P.i2 { margin-left:4em }
+</style>
+</head>
+<body>
+
+<h2 style="text-align:center"><a name="thbuild"></a>&#931;&#959;&#966;&#943;&#945; General Tools</h2>
+
+
+<h3>Running the Test History Builder</h3>
+
+<p>The test history builder is used to create a test history from a collection of
+trace files. A test history shows which basic blocks were exercised by which
+test cases, information that is needed by DejaVu for test selection, among other
+uses. The test history builder currently only works on basic block traces, a
+limitation we will look to address in the future. To use it, run the command:</p>
+
+<p><code>java sofya.tools.TestHistoryBuilder -&lt;E|X|C|B&gt; [-tag <i>tag</i>]
+ &lt;tracedir&gt; &lt;histfile&gt; &lt;classname|listfile&gt;</code><br> 
+<p class="i1"><code>-E|X|C|B</code></p>
+<p class="i2">Instructs the test history builder to include only
+selected block types in the test history. Allows any combination of the listed values,
+where E corresponds to virtual <i>entry</i> blocks, X corresponds to
+virtual <i>exit</i> blocks, C corresponds to call blocks, and B corresponds to
+all other basic blocks.</p>
+<p class="i1"><code>-tag <i>tag</i></code></p>
+<p class="i2">Gives the database tag associated with the control flow
+and map files required by the test history builder. Only necessary if a tag was
+specified to the CFG builder when constructing the control flow graphs.
+<p class="i1"><code><i>tracedir</i></code></p>
+<p class="i2">Gives the location of the directory containing the traces
+from which to construct the test history.</p>
+<p class="i1"><code><i>histfile</i></code></p>
+<p class="i2">Gives the name of the history file to be created.</p>
+<p class="i1"><code><i>classname</i>|<i>listfile</i></code></p>
+<p class="i2">Gives the name of the class or the program list file
+containing the list of classes for which the test history is being constructed.</p>
+
+<p>The test history builder will generate a file with the specified name containing the test
+history information computed from the trace files.</p>
+
+<p><strong>Note:</strong> If you use the '<code>-tag</code>' parameter, the
+program list file must also be associated with that tag in the database directory. The traces files, in the tracedir directory, should start their numeration with t0, t1, and so on.</p>
+
+
+<h3><a name="coverage"></a>Collecting coverage information</h3>
+
+<p>&#931;&#959;&#966;&#943;&#945; provides a tool for reporting the basic block
+coverage achieved by a test suite. The coverage tool uses a test history file
+to compute this information, so you must first instrument the program for basic
+block coverage tracing, collect trace files, and construct the basic block test
+history as described above. <em>Note that because of the dependency on test
+histories, &#931;&#959;&#966;&#943;&#945; does not currently support reporting
+of aggregated branch coverage. Branch coverage can still be derived from
+individual branch trace files, however.</em> Then you can run the coverage tool
+with the following command:</p>
+
+<p><code>java sofya.tools.Coverage &lt;test_history&gt; [-ALL]</code></p>
+<p class="i1"><code>test_history</code></p>
+<p class="i2">The name of the test history file from which to compute coverage data.</p>
+<p class="i1"><code>ALL</code></p>
+<p class="i2">This argument instructs the coverage tool to print an output for every
+block, whether it was covered or not. If omitted, only blocks that were not covered
+are printed by default.</p>
+
+<p>The previous command will cause the coverage information encoded in the test
+history to be printed to the console.</p>
+
+
+<h3><a name="statistics"></a>Collecting statistical information</h3>
+
+<p>A tool is provided with &#931;&#959;&#966;&#943;&#945; that can print a variety
+of useful statistics about a Java class file, jar file, or program. The statistics
+tool can be run with the following command:</p>
+
+<p><code>java sofya.tools.Statistics [-o &lt;outfile&gt;] &lt;classfile|jarfile|listfile&gt;
+  [classfile|jarfile|listfile ...]</code></p>
+<p class="i1"><code>-o <i>outfile</i></code></p>
+<p class="i2">Specifies a file where the statistical output should be written.</p>
+<p class="i1"><code>&lt;classfile|jarfile|listfile&gt;</code></p>
+<p class="i2">The name of a Java class, jar file, or program list file specifying
+classes on which the statistics tool should report. Any number of classes, jar
+files, or list files can be specified, and the statistics tool will report
+aggregate information for all of the Java classes.</p>
+
+<p>The simplest way to see the types of statistics reported by this tool is to
+run the tool on a class. This can be accomplished by running the tool on itself:</p>
+
+<p><code>java sofya.tools.Statistics sofya.tools.Statistics</code></p>
+
+<p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Instrumentation and Tracing Tools (Sofya User Manual)</title>
+</head>
+<body>
+<h3>Running the Instrumentor</h3>
+<a name="cfInst"></a>
+
+<h4>Getting Started</h4>
+
+<p>To run the instrumentor to instrument a class for traced execution, use the following command:</p>
+
+<p><code>java sofya.inst.cfInstrumentor [-tag <i>tag</i>] &lt;-&lt;E|X|C|B&gt;|-branch&gt;
+&lt;classname|jarfile|listfile&gt; [classname|jarfile ...] </code></p>
+
+<p>The <code>tag</code> parameter is used to specify a database tag associated
+with the control flow and map files required by the instrumentor
+(see information on the <a href="graphs.html#cfg">CFG builder</a>). If you did
+not specify a tag to the CFG builder when constructing the control flow graphs
+for the classes you intend to instrument, you do not need to use this
+parameter.</p>
+
+<p>The first required parameter specifies either basic block instrumentation or branch
+instrumentation. To instrument basic blocks, any combination of the characters E, X, C, and B
+can be specified, where E specifies virtual <em>entry</em> blocks, X specifies virtual
+<em>exit</em> blocks, C specifies call blocks, and B specifies all other basic blocks. Entry
+and exit blocks do not correspond to actual code, but rather provide information about entry
+to and exit from methods. Branch instrumentation is not parameterized, though branch
+types can be filtered during tracing (this is discussed under <a href="#tracers">tracing</a>).
+
+<p>When specifying a single class for instrumentation, the rules regarding inclusion of the
+<em>.class</em> extension are the same as for the <a href="graphs.html#cfg">CFG builder</a>.
+However, the instrumentor exhibits  additional behaviors with respect to
+the format of the class name. If an absolute path is given, the instrumentation
+will be directly applied to the given classfile, at the classfile's current location.
+If the class is loaded from the classpath, the resulting instrumented classfile will
+be placed in the working directory from which the instrumentor is run.</p>
+
+<p>The instrumentor also accepts jar files and program list files to specify the classes
+to be instrumented. Program list files are automatically found in the database, using
+the tag if one is specified. Any necessary path information
+should be provided when passing a jar file as an argument. When a jar file is passed
+as an argument on the command line, every class in the jar is instrumented.
+The preferred way to include classes in a jar file is to include the jar file
+in a program list file and supply the program list file as an argument instead, as a
+program list file permits you to exclude classes in the jar from processing. Any number
+of specific classes, jar files, and program list files can be passed to the instrumentor,
+though supplying a single program list file is the expected typical use.</p>
+
+<h4>Advanced Instrumentation</h4>
+
+<p>Running the instrumentor as described in <em>Getting Started</em> instruments class
+files for collection of coverage traces using the standard filter for tracing. The full
+usage for the instrumentor is the following:</p>
+
+<p><code>java sofya.inst.cfInstrumentor [-tag <i>tag</i>] &lt;-&lt;B|E|X|C&gt;|-branch&gt; [-t
+&lt;norm|junit|seq&gt;[,junit]] [-port <i>port</i>] [-so] &lt;classname|jarfile|listfile&gt;
+[classname|jarfile ...]</code></p>
+
+<p>The <code>-t</code> parameter is used to change the inserted instrumentation
+to target different mechanisms for collecting the trace information. Currently,
+the following values for this parameter are available:
+</p>
+<div>
+<ul>
+<li><code>norm</code>: The default, this instrumentation enables generation
+of coverage traces. Sequence traces cannot be generated from this instrumentation.
+<li><code>seq</code>: This instrumentation enables generation of sequence traces.
+Coverage traces can also be collected, but less efficiently.
+<li><code>junit</code>: This instrumentation enables generation of traces through
+the <code>JUnit</code> framework during execution of a <code>JUnit</code> test
+suite. Traces can be generated from classes containing this instrumentation
+only by using the <code>junit.textui.SelectiveTestRunner</code>; regular
+filter tracers will fail. This value is actually a modifier that can be combined
+with <code>norm</code> or <code>seq</code> to allow generation of either of those
+respective types of traces from the execution of a <code>JUnit</code> test suite.
+When used alone, <code>junit</code> is equivalent to <code>norm,junit</code>,
+enabling generation of coverage traces of JUnit tests.
+</ul>
+</div>
+<p>If a tracer reports an error about being unable to bind to a socket, the <code>-port</code>
+parameter can be used to change the socket used by the instrumentation. If you specify a custom
+port during instrumentation, you must specify the same port to the tracer when you run the
+instrumented class.</p>
+
+<p>The <code>-so</code> parameter is used to instruct the instrumentor to only insert
+the code that starts the connection to a tracer. This is useful for test driver
+classes which execute instrumented classes, but which are themselves not of interest for
+instrumentation or tracing.</p>
+
+<h3>Running the Tracers</h3>
+<a name="tracers"></a>
+
+<p>The program tracers in the <code>inst</code> package of &#931&#959&#966&#943&#945
+are the classes with names containing <code>Filter</code>, which derives from the
+fact that the tracers all support some type of filtering of the trace events raised
+by the instrumentation. These are the tools used to execute instrumented programs
+and collect trace files that record the behaviors of those programs.</p>
+
+<h4>Getting Started</h4>
+
+<p>To use the basic tracer (<code>Filter</code>) to collect a basic block coverage
+trace of the execution of an instrumented program, make sure the main class can be
+found on your Java classpath. Then run the following command:</p>
+
+<p><code>java sofya.inst.Filter -&lt;E|X|C|B&gt; &lt;classname&gt;</code> 
+<code>&lt;arguments&gt;</code></p>
+
+<p>The first parameter functions the same way as described for the instrumentor,
+where any combination of the given values can be specified. Only blocks of the
+selected types will be included in the generated trace file, where E specifies
+virtual <em>entry</em> blocks, X specifies virtual <em>exit</em> blocks, C
+specifies call blocks, and B specifies all other basic blocks. For performance
+reasons, the typical usage is to trace all of the block types for which
+instrumentation was inserted. However, this filtering capability provides the
+opportunity to instrument a program for all types of blocks and then select
+only the block types of interest to particular analyses when collecting traces.
+Note that if a block type is requested that was not specified during
+instrumentation, information about those blocks will <em>not</em> appear
+in the generated trace.</p>
+
+<p>The <code>classname</code> argument should be the fully qualified name of
+the main class for the program, and should <em>not</em> include the
+<em>.class</em> extension.</p>
+
+<p>By default, the tracer will create a file named &quot;instout.tr&quot; in the
+database directory which contains the trace information. Each time the tracer
+is run it will overwrite this file, unless otherwise specified (see below),
+so it is the responsibility of the user to store the file somewhere permanent,
+if desired. The trace file can be viewed using the
+<a href="viewers.html#TraceViewer">TraceViewer</a>.</p>
+
+<h4>Advanced Tracing</h4>
+
+<p>There are additional options available for controlling the behavior of
+<code>Filter</code>, as well as other tracers to collect different types of
+traces.</p>
+
+<h5>Filter</h5>
+
+<p>The full usage for <code>Filter</code> is the following:
+</p>
+<div>
+<code>java sofya.inst.Filter [-port <i>n</i>] [-cp <i>path</i>]
+ [-i] [-tl <i>num_secs</i>] [-at] [-o <i>output_file</i>] [-trname <i>trace_name</i>]
+ -&lt;E|X|C|B&gt; &lt;classfileName&gt; &lt;arguments&gt;</code>
+</div>
+<p style="margin-left:2em"><code>-port <i>n</i></code></p>
+<p style="margin-left:4em">Instructs the tracer to listen for the instrumentation
+connection on port number <i>n</i>.</p>
+<p style="margin-left:2em"><code>-cp <i>path</i></code></p>
+<p style="margin-left:4em">Causes the tracer to set the CLASSPATH for the subject
+program to <i>path</i>.</p>
+<p style="margin-left:2em"><code>-i</code></p>
+<p style="margin-left:4em">Enables piping of <code>stdin</code> to the subject
+program. Programs requiring user input will deadlock if this option is not enabled.</p>
+<p style="margin-left:2em"><code>-tl <i>num_secs</i></code></p>
+<p style="margin-left:4em">Instructs the tracer to kill the subject after
+<i>num_secs</i> if it has not yet terminated. This option should be used instead
+of sending a kill signal to the tracer, as it enables the tracer to perform cleanup
+and generate the trace file for the subject program up to the point it was terminated.</p>
+<p style="margin-left:2em"><code>-at</code></p>
+<p style="margin-left:4em">Causes the tracer to append the current trace to the
+existing trace file of the same name, if it already exists.</p>
+<p style="margin-left:2em"><code>-trname <i>trace_name</i></code></p>
+<p style="margin-left:4em">Instructs the tracer to name the trace file
+<i>trace_name</i>. The <em>.tr</em> extension should be omitted.</p>
+<p style="margin-left:2em"><code>-o <i>output_file</i></code></p>
+<p style="margin-left:4em">Causes the tracer to redirect the subject program's output
+to <i>output_file</i>. Both <code>stdout</code> and <code>stderr</code> are redirected
+to the specified file.</p>
+<p style="margin-left:2em"><code>-&lt;B|E|X|C&gt;</code></p>
+<p style="margin-left:4em">Specifies the block types to be included in the generated
+trace. All permutations are allowed.</p>
+
+<h5>SequenceFilter</h5>
+
+<p>The tracer <code>SequenceFilter</code> is used to collect a basic
+block sequence trace of the execution of a program. A sequence trace lists all of
+the basic blocks executed by the program, in order. The program must
+be instrumented for sequence tracing to use this tracer; a program instrumented
+for coverage tracing cannot be executed. This tracer produces a trace file in
+the database directory named &quot;instout.seq&quot; that is readable without
+the use of a viewer. <code>SequenceFilter</code> provides the following options
+in addition to those provided by <code>Filter</code>:</p>
+
+<p style="margin-left:2em"><code>-pre <i>data</i></code></p>
+<p style="margin-left:4em">Causes the tracer to insert <i>data</i> at the start
+of the trace file, before any trace data.</p>
+<p style="margin-left:2em"><code>-post <i>data</i></code></p>
+<p style="margin-left:4em">Causes the tracer to append <i>data</i> at the end
+of the trace file, after any trace data.</p>
+<p style="margin-left:2em"><code>-relay</code></p>
+<p style="margin-left:4em">Instructs the tracer to transmit the trace
+(including any <code>-pre</code> or <code>-post</code> data) through a socket
+to the port used by a DAG builder to perform dynamic impact analysis.</p>
+
+<p>All other options to this tracer are the same as the options to
+<code>Filter</code>. Note that <code>SequenceFilter</code>
+writes <em>entry</em> and <em>exit</em> block events to the trace file in a
+format specifically designed for use in DAG construction. Finally, be
+aware that the trace files generated by this tracer can be extremely
+large.</p>
+
+<h5>BranchFilter</h5>
+
+<p>The tracer <code>BranchFilter</code> is used to collect a branch coverage
+trace of the execution of a program. As with <code>Filter</code>, it generates
+a trace named &quot;instout.tr&quot; in the database directory. Note that the
+<code>TraceViewer</code> automatically distinguishes the contents of a trace file.
+The usage for <code>BranchFilter</code> is identical to that of <code>Filter</code>
+except that branch types are specified instead of block types. Any combination
+of I, S, T, C, E, and O is permitted, where the types are as follows:</p>
+
+<p style="margin-left:2em">I : <code>if</code> branches</p>
+<p style="margin-left:2em">S : <code>switch</code> branches</p>
+<p style="margin-left:2em">T : <code>throw</code> branches</p>
+<p style="margin-left:4em">A <code>throw</code> is only considered as a branch if
+it potentially throws more than one class of exception.</p>
+<p style="margin-left:2em">C : <code>call</code> branches</p>
+<p style="margin-left:4em">A call is considered a branch because execution may
+be transferred to some other location in the event that the called method
+throws an exception.</p>
+<p style="margin-left:2em">E : <code>entry</code> branches.</p>
+<p style="margin-left:4em">A method entry is not a branch but is included
+to permit some analyses to keep track of the execution of new methods.</p>
+<p style="margin-left:2em">O : <code>other</code> branches.</p>
+<p style="margin-left:4em">The &quot;other&quot; branch is the branch that
+is taken when execution leaves a method for a reason that could not be
+statically determined, such as a thrown <code>Error</code>.</p>
+
+<h5>BranchSequenceFilter</h5>
+
+<p>The tracer <code>BranchSequenceFilter</code> is used to collect a branch
+sequence trace of the execution of a program. Its usage is identical to that
+of <code>SequenceFilter</code> except that branch types are specified instead of
+block types.<p>
+
+<p>&nbsp;</p>
+</body>
+</html>
