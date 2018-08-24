@@ -13,8 +13,10 @@
 You must read and accept all of the terms and conditions of this license prior
 to downloading, installing and/or using the software.
 </p>
-<p>The current version of &#931;&#959;&#966;&#943;&#945; can be downloaded from the
+<p>The current version (2.1.7) of &#931;&#959;&#966;&#943;&#945; can be downloaded from the
 <a href="http://github.com/SofyaTool/SofyaForJava">SofyaForJava</a> Git repository.
+Previous versions are also avaiable there.  Each version is provided in archive format
+supporting the installation instructions <a href=#1">provided</a>.
 </p>
 <p>The &#931;&#959;&#966;&#943;&#945; Java analysis system is written entirely in Java,
 so it is theoretically possible to install and run the system on any architecture
@@ -39,14 +41,14 @@ software required the BCEL version 5.2 library
 (available <a href="../../files/bcel-5.2.tar.gz">here</a>).
 The latest version (2.1.7) of &#931;&#959;&#966;&#943;&#945; uses BCEL
 6.0 which is included within the  &#931;&#959;&#966;&#943;&#945; package,
-or the jar can be downloaded <a href="../../files/bcel-6.0.jar">here.</a>.
-You may also try using the latest version of BCEL (6.2) from the 
+or the jar can be downloaded <a href="../../files/bcel-6.0.jar">here</a>.
+You may also try using the latest version of BCEL (6.2) from the
 official <a href="https://commons.apache.org/proper/commons-bcel/download_bcel.cgi">
-site</a>.
+site</a>.  Installation instructions for BCEL are provided <a href="#2">below</a>.
 </p>
 <p>Do the following to install &#931;&#959;&#966;&#943;&#945;.</p>
 
-<h3>Install &#931;&#959;&#966;&#943;&#945;</h3>
+<h3 name="1">Install &#931;&#959;&#966;&#943;&#945;</h3>
 <ol>
    <li>Choose where to extract the &#931;&#959;&#966;&#943;&#945; system. On extraction,
        a directory called "sofya" will be created in this location.</li>
@@ -67,7 +69,7 @@ site</a>.
        <p><code>setenv CLASSPATH &quot;${CLASSPATH}&quot;:${HOME}/tools/sofya/lib/commons-collections.jar:${HOME}/tools/sofya/lib/trove/lib/trove.jar:${HOME}/tools/sofya/lib/bcel-6.0.jar</code>
        </p></li>
 </ol>
-<h3>Install BCEL</h3>
+<h3 name="2">Install BCEL</h3>
 <p>If you have downloaded version Sofya 2.1.7, the bcel 6.0 beta version is provided within
 the <i>sofya/lib</i> directory.</p>
 <ol>
@@ -75,7 +77,9 @@ the <i>sofya/lib</i> directory.</p>
 <code>${HOME}/tools</code> directory (in csh/tcsh):
 <p><code>setenv CLASSPATH &quot;${CLASSPATH}&quot;:${HOME}/tools/sofya/lib/bcel-6.0.jar</code></p></li>
 </ol>
-<p>If you have downloaded an earlier Sofya version (prior to version 2.1.7) follow these steps:</p>
+<p>If you have downloaded an earlier Sofya version (prior to version 2.1.7)
+or wish to try the latest BCEL from the official Apache Commons site
+follow these steps:</p>
 <ol>
   <li>Choose where to extract the BCEL system</li>
   <li>Unzip the package using gunzip: <code>gunzip bcel-5.2.tar.gz</code></li>
