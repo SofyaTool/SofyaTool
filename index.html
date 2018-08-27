@@ -8,23 +8,26 @@
 UL.dblspaced>LI {
   padding-bottom:1em;
 }
+header {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+}
 </style>
 </head>
 
 <body style="background-color: #FFFFFF">
-<table cellpadding="6" cellspacing="0" border="0" width="100%">
-<tr>
-<td colspan="2" style="width:'100%';height:80;vertical-align='center';background-color='#999999'">
-<h1><font size="+2" color="#FFFFFF">Sofya&nbsp;Analysis&nbsp;Tool</font></h1>
-</td>
-</tr>
-<tr>
-<td width="18%" bgcolor="#EEEEEE" valign="top">
-<ul id="links" style="list-style:none;margin:1em;padding;0;text-indent:0'">
-<li style="padding-bottom:16px"><a href="">First link</a>
-</ul>
-</tr>
-<tr>
+<header>
+  <nav>
+    <ul>
+        <li><a href="https://sofyatool.github.io/SofyaTool/index.html">Main</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/installation.html">Installation</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/user/index.php">User's Manual</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/api/index.php">API Reference</a></li>
+    </ul>
+  </nav>
+</header>
 <h2 style="text-align:center">&#931;&#959;&#966;&#943;&#945;: A Java Bytecode Analysis Tool</h2>
 
 <p>Analysis of programs forms an important activity in the field of software engineering. It is
@@ -97,8 +100,6 @@ Any opinions, findings, and conclusions or
 recommendations expressed in this material are those of the author(s) and 
 do not necessarily reflect the views of the National Science Foundation. 
 </p>
-</tr>
-</table>
 <hr>
 <p style="font-size:10pt">Page last updated by Wayne Motycka: 10/21/2015</p>
 </body>
