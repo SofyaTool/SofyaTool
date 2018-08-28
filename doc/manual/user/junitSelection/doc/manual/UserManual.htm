@@ -1,71 +1,90 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="en">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-		<title>JUnit Test Selection Manual</title>
-	</head>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>JUnit Test Selection Manual</title>
+<style type="text/css">
+header {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+}
+</style>
+</head>
 
-	<body style="BACKGROUND-COLOR: rgb(255,255,255)">
-		<h2 style="TEXT-ALIGN: center">JUnit Test Selection Manual</h2>
-		<p>&nbsp;&nbsp;&nbsp;&nbsp; The test runner is invoked in the same way as the standard textui test runner implementation: <code>java junit.textui.SelectiveTestRunner&lt;testsuite&gt;&nbsp; </code>
-			<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;However it supports the following additional options:       
-		</p>
+<body style="BACKGROUND-COLOR: rgb(255,255,255)">
+<header>
+   <nav>
+      <ul>
+        <li><a href="https://sofyatool.github.io/SofyaTool/index.html">Main</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/installation.html">Installation</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/user/index.php">User's Manual</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/api/index.html">API Reference</a></li>
+      </ul>
+   </nav>
+</header>
+<div style="margin-left:150px;">
+<h2 style="TEXT-ALIGN: center">JUnit Test Selection Manual</h2>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; The test runner is invoked in the same way as the standard textui test runner implementation: <code>java junit.textui.SelectiveTestRunner&lt;testsuite&gt;&nbsp; </code>
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;However it supports the following additional options:       
+</p>
 
-		<ul>
-			<li>
-				<code>-names: </code> Lists each of the test cases encountered as a test number and test name, which can be used to select the test using the options described below. The test cases are not run.&nbsp;
-				<br /><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;java junit.textui.SelectiveTestRunner -names subject.tests.ATestSuite </code>
-			</li>
-					
-			<li>
-				<code>-sID&lt;id1,id2,id4-id7,...,idN&gt;:</code> Select tests by number (ID). Accepts a comma-delimited list of test numbers identifying tests to be run. Ranges are allowed.&nbsp;
-				<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Invoke the test runner on a single test case and capture the output directly with redirection (such as in a javamts script)
-				<br /><code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner -sID 5 subject.tests.ATestSuite &gt;&amp; t5 </code>
-			</li>
+<ul>
+<li>
+<code>-names: </code> Lists each of the test cases encountered as a test number and test name, which can be used to select the test using the options described below. The test cases are not run.&nbsp;
+<br /><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;java junit.textui.SelectiveTestRunner -names subject.tests.ATestSuite </code>
+</li>
 
-			<li>
-				<code>-sName &lt;name1,name2,...,nameN&gt;</code> Select tests by name. Accepts a comma-delimited list of test names.
-				<br /> <code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner -sName subject.tests.testMethod subject.tests.ATestSuite</code>
-			</li>
+<li>
+<code>-sID&lt;id1,id2,id4-id7,...,idN&gt;:</code> Select tests by number (ID). Accepts a comma-delimited list of test numbers identifying tests to be run. Ranges are allowed.&nbsp;
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Invoke the test runner on a single test case and capture the output directly with redirection (such as in a javamts script)
+<br /><code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner -sID 5 subject.tests.ATestSuite &gt;&amp; t5 </code>
+</li>
 
-			<li>
-				<code>-o&lt;dir&gt;:</code> Instructs the test runner to save outputs of test cases to directory 'dir'. The files will be named in the form tX where X is the test number. (For example, running tests 3-5 would produce the files 't3', 't4', and 't5'). 
-				<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Run multiple test cases, saving results to 'outputs' directory 
-				<br /> <code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner -sID 3,5,9-12 -o outputs subject.tests.ATestSuite </code>
-				<br /><br /> When the '-o' option is active, the test runner prints a notification before each test case is run, in the same style as javamts scripts. Generally, it is expected that the '-o' option will be used unless only one test case is being run. Without the '-o' option, only the output of test cases is printed to the console. This allows a javamts script to invoke the test runner for individual test cases and treat the output as if it were the result of invoking the test case directly. (Note: If the '-d' option is also used, the difference message will always be printed).
-			</li>
-			
-			<li>
-				<code>-d&lt;dir&gt;:</code> Instructs the test runner to difference the output of each test case with the output from a previous run of that test case, found in directory 'dir'. A message is printed for outputs that differ. Trace files will also be diffed when executing a traced run.&nbsp; 
-				<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Run multiple test cases, saving outputs, and diffing against previous outputs, in 'previous' directory.&nbsp;
-				<br /><code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner -sID 3,5,9-12 -o outputs -d previous subject.tests.ATestSuite</code>
-				<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Note: It is also possible to difference against previous outputs while discarding the outputs of the current test run).
-			</li>				
+<li>
+<code>-sName &lt;name1,name2,...,nameN&gt;</code> Select tests by name. Accepts a comma-delimited list of test names.
+<br /> <code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner -sName subject.tests.testMethod subject.tests.ATestSuite</code>
+</li>
 
-			<li>
-				<code>-p:</code> Instructs the test runner to prioritize the tests. The tests will be executed in a specified order as inserted in command line.
-				<br /><code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner subject.tests.ATestSuite -p -sID 3,1,2</code>
-			</li>
-			
-			<li>
-				<code>-univ&lt;name&gt;:</code> Generate a universe file that can be used to run the same set of tests one at a time. 
-				<br /><code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner subject.tests.ATestSuite -sID 1-3 -univ UniverseFile.txt</code>
-			</li>
-					
-			<li>
-				<code>-t &lt;options&gt;</code> Instructs the test runner to collect trace information for each test case in trace files. The subject classes must be instrumented using the '-junit' option to <i>sofya.ed.cfInstrumentor. </i> The &lt;options&gt; portion is a comma delimited list of option name/value pairs in the form 'name=value'. The following options are valid: 
-				<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>type= B|E|X|C </i> : Required option, specifies the type of trace to be run.&nbsp; 
-				<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>at= true|false </i>: Optional, instructs the test runner to append each trace to the previous trace, creating a single trace file for multiple test cases. 
-				<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>trname=&lt;filename&gt;</i>: Optional, instructs the test runner to name the trace file 'filename.tr' instead of the default 'instout.tr' (do not include the .tr extension)&nbsp; 
-				<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Invoke the test runner on a tracing basic blocks test case and capture the output directly with redirection: 
-				<br /><code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner -sID 5 -t type=B subject.tests.ATestSuite &gt;&amp; t5</code>
-				<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Run multiple test cases, creating cumulative trace file 
-				<br /> <code>&nbsp;&nbsp;&nbsp;&nbsp; javajunit.textui.SelectiveTestRunner-sID1-5-ttype=EXC,at=true&nbsp;&nbsp; subject.tests.ATestSuite</code> <br />
-			</li>
-		</ul>
+<li>
+<code>-o&lt;dir&gt;:</code> Instructs the test runner to save outputs of test cases to directory 'dir'. The files will be named in the form tX where X is the test number. (For example, running tests 3-5 would produce the files 't3', 't4', and 't5'). 
+<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Run multiple test cases, saving results to 'outputs' directory 
+<br /> <code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner -sID 3,5,9-12 -o outputs subject.tests.ATestSuite </code>
+<br /><br /> When the '-o' option is active, the test runner prints a notification before each test case is run, in the same style as javamts scripts. Generally, it is expected that the '-o' option will be used unless only one test case is being run. Without the '-o' option, only the output of test cases is printed to the console. This allows a javamts script to invoke the test runner for individual test cases and treat the output as if it were the result of invoking the test case directly. (Note: If the '-d' option is also used, the difference message will always be printed).
+</li>
 
-		<p><strong><BR>Known Issues</strong></p>
-		<p>Tracing the recursive case (running JUnit tests for instrumented JUnit itself) will not give correct results. The test selection classes subclass the instrumented classes, causing trace data to be recorded which represents the execution of the invoking environment as well as the test cases themselves.<br />Creation of traces and saving of outputs will NOT work with test suites built using the junit.extensions.ActiveTestSuite class. The test runner depends on the sequential execution of the test cases, an assumption which is violated by the ActiveTestSuite class.</p>
-			
-	</body>
+<li>
+<code>-d&lt;dir&gt;:</code> Instructs the test runner to difference the output of each test case with the output from a previous run of that test case, found in directory 'dir'. A message is printed for outputs that differ. Trace files will also be diffed when executing a traced run.&nbsp; 
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Run multiple test cases, saving outputs, and diffing against previous outputs, in 'previous' directory.&nbsp;
+<br /><code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner -sID 3,5,9-12 -o outputs -d previous subject.tests.ATestSuite</code>
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Note: It is also possible to difference against previous outputs while discarding the outputs of the current test run).
+</li>				
+
+<li>
+<code>-p:</code> Instructs the test runner to prioritize the tests. The tests will be executed in a specified order as inserted in command line.
+<br /><code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner subject.tests.ATestSuite -p -sID 3,1,2</code>
+</li>
+
+<li>
+<code>-univ&lt;name&gt;:</code> Generate a universe file that can be used to run the same set of tests one at a time. 
+<br /><code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner subject.tests.ATestSuite -sID 1-3 -univ UniverseFile.txt</code>
+</li>
+
+<li>
+<code>-t &lt;options&gt;</code> Instructs the test runner to collect trace information for each test case in trace files. The subject classes must be instrumented using the '-junit' option to <i>sofya.ed.cfInstrumentor. </i> The &lt;options&gt; portion is a comma delimited list of option name/value pairs in the form 'name=value'. The following options are valid: 
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>type= B|E|X|C </i> : Required option, specifies the type of trace to be run.&nbsp; 
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>at= true|false </i>: Optional, instructs the test runner to append each trace to the previous trace, creating a single trace file for multiple test cases. 
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>trname=&lt;filename&gt;</i>: Optional, instructs the test runner to name the trace file 'filename.tr' instead of the default 'instout.tr' (do not include the .tr extension)&nbsp; 
+<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Invoke the test runner on a tracing basic blocks test case and capture the output directly with redirection: 
+<br /><code>&nbsp;&nbsp;&nbsp;&nbsp; java junit.textui.SelectiveTestRunner -sID 5 -t type=B subject.tests.ATestSuite &gt;&amp; t5</code>
+<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Run multiple test cases, creating cumulative trace file 
+<br /> <code>&nbsp;&nbsp;&nbsp;&nbsp; javajunit.textui.SelectiveTestRunner-sID1-5-ttype=EXC,at=true&nbsp;&nbsp; subject.tests.ATestSuite</code> <br />
+</li>
+</ul>
+
+<p><strong><BR>Known Issues</strong></p>
+<p>Tracing the recursive case (running JUnit tests for instrumented JUnit itself) will not give correct results. The test selection classes subclass the instrumented classes, causing trace data to be recorded which represents the execution of the invoking environment as well as the test cases themselves.<br />Creation of traces and saving of outputs will NOT work with test suites built using the junit.extensions.ActiveTestSuite class. The test runner depends on the sequential execution of the test cases, an assumption which is violated by the ActiveTestSuite class.</p>
+</div>
+</body>
 </html>

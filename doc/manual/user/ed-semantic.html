@@ -7,10 +7,27 @@
 <style type="text/css">
 P.i1 { margin-left:2em }
 P.i2 { margin-left:4em }
+header {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+}
+
 </style>
 </head>
 <body>
-
+<header>
+   <nav>
+      <ul>
+        <li><a href="https://sofyatool.github.io/SofyaTool/index.html">Main</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/installation.html">Installation</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/user/index.php">User's Manual</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/api/index.html">API Reference</a></li>
+      </ul>
+   </nav>
+</header>
+<div style="margin-left:150px;">
 <h2 style="text-align:center">Using the semantic event dispatch framework</h2>
 
 <p>Contents of this document:</p>
@@ -630,7 +647,7 @@ version of the EDL specification.</p>
 <p><em>Note that the instrumentation should only ever be applied once, or the
 behavior is undefined.</em> If the parameters of the instrumentation need to
 be changed, the system should be recompiled first and then instrumented again.</p>
-
+</div>
 <p>&nbsp;</p>
 </body>
 </html>
