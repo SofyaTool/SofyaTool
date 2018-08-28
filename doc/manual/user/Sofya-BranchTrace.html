@@ -13,9 +13,27 @@ h3 {
 code {
   font-size: large;
 }
+header {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+}
 </style>
 </head>
 <body>
+<header>
+  <nav>
+    <ul>
+        <li><a href="https://sofyatool.github.io/SofyaTool/index.html">Main</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/installation.html">Installation</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/user/index.html">User's Manual</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/doc/api/index.html">API Reference</a></li>
+        <li><a href="https://sofyatool.github.io/SofyaTool/files/examples/index.html">Examples</a></li>
+    </ul>
+  </nav>
+</header>
+<div style="margin-left:150px;">
 <h2>Branch Tracing with Sofya</h2>
 <p>
 Branch tracing in Sofya generates a list of covered edges in the CFG graph of
@@ -159,7 +177,7 @@ node   label   endline   cf-successors (node-id(edge-id,"edge-label"))
 Drawing the CFG from the <code>CFViewer</code> output for the <em>findVertex()</em>
 method in Test.java would produce a CFG diagram like this:
 </p>
-<div class="western" style="text-align:center;margin-bottom: 0in; font-weight: medium; float:left; width:55%;">
+<div class="western" style="text-align:center;margin-bottom: 0in; font-weight: medium; float:left; width:45%;">
 <img src="Test.java.cfg.png" name="CFG_of_Test.java" width=305 height=410 alt="CFG Graph of Test.java" style="border:0;">
 <br />
 </div>
@@ -184,10 +202,10 @@ focus on branch-type concerns and the subsumed edges in the Sofya branch
 analysis.
 </p>
 <p>
-<a href="http://sofya.unl.edu/doc/manual/user/ed-structural.html#cfInst">
+<a href="ed-structural.html#cfInst">
 Instrumenting</a> the Test subject for tracing <em>if</em> branches
 using <code>sofya.ed.cfInstrumentor</code> and
-<a href="http://sofya.unl.edu/doc/manual/user/ed-structural.html#BranchTr">executing</a> the subject using <code>sofya.ed.BranchTracer</code>
+<a href="ed-structural.html#BranchTr">executing</a> the subject using <code>sofya.ed.BranchTracer</code>
 produces an output file, <code>instout.tr</code>, which contains:
 </p>
 <pre style="border:solid;border-width:1px;">
@@ -329,5 +347,6 @@ node label    S      E     node-id(edge-id,"edge-label",[branch-ids])
   10   X     65     65
   11   X      0     65
 </pre>
+</div>
 </body>
 </html>
