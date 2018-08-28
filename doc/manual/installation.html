@@ -11,27 +11,37 @@
 UL.dblspaced>LI {
   padding-bottom:1em;
 }
-header {
+.header {
+  height:50px;
+  background:#F0F0F0;
+  border:1px solid #CCC;
+  width:100%;
   position:fixed;
   top:0;
   left:0;
-  width:100%;
+}
+.listhorz {
+  list-style:none;
+}
+.lihorz {
+  display:inline;
+  margin-left:60px;
 }
 </style>
 </head>
 <body style="background-color:#FFFFFF">
-<header>
+<div class="header">
    <nav>
-      <ul>
-        <li><a href="https://sofyatool.github.io/SofyaTool/index.html">Main</a></li>
-        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/installation.html">Installation</a></li>
-        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/user/index.html">User's Manual</a></li>
-        <li><a href="https://sofyatool.github.io/SofyaTool/doc/api/index.html">API Reference</a></li>
+      <ul class="listhorz">
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/index.html">Main</a></li>
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/doc/manual/installation.html">Installation</a></li>
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/doc/manual/user/index.html">User's Manual</a></li>
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/doc/api/index.html">API Reference</a></li>
       </ul>
    </nav>
-</header>
-<div style="margin-left:150px;">
-<h1 style="text-align:center">Installation Instructions</h1>
+</div>
+<div style="margin-left:150px;margin-top:60px;">
+<h1 style="text-align:center">Sofya Installation Instructions</h1>
 <div style="margin-bottom:3em;"></div>
 <p>Use of &#931;&#959;&#966;&#943;&#945; is governed by the
 <a href="../../LICENSE-1.0">University of Nebraska Open Academic License</a>.
