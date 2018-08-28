@@ -4,6 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>JUnit Test Selection Manual</title>
 <style type="text/css">
+.smalltext {
+  font-size:8pt;
+}
 header {
   position:fixed;
   top:0;
@@ -86,5 +89,8 @@ header {
 <p><strong><BR>Known Issues</strong></p>
 <p>Tracing the recursive case (running JUnit tests for instrumented JUnit itself) will not give correct results. The test selection classes subclass the instrumented classes, causing trace data to be recorded which represents the execution of the invoking environment as well as the test cases themselves.<br />Creation of traces and saving of outputs will NOT work with test suites built using the junit.extensions.ActiveTestSuite class. The test runner depends on the sequential execution of the test cases, an assumption which is violated by the ActiveTestSuite class.</p>
 </div>
+<hr>
+<p class="smalltext">Author: Alex Kinneer &#169; 2006 University of Nebraska - Lincoln.</p>
+<p class="smalltext">Page last updated by Wayne Motycka: 08/27/2018</p>
 </body>
 </html>
