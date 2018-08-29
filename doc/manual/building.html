@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Building Sofya</title>
+<style type='text/css'>
+.smalltext {
+  font-size:8pt;
+}
+UL.dblspaced>LI {
+  padding-bottom:1em;
+}
+.header {
+  height:50px;
+  background:#F0F0F0;
+  border:1px solid #CCC;
+  width:100%;
+  position:fixed;
+  top:0;
+  left:0;
+}
+.listhorz {
+  list-style:none;
+}
+.lihorz {
+  display:inline;
+  margin-left:60px;
+}
+</style>
+</head>
+<body style="background-color:#FFFFFF">
+<div class="header">
+   <nav>
+      <ul class="listhorz">
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/index.html">Sofya Home</a></li>
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/doc/manual/installation.html">Installation</a></li>
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/doc/manual/user/index.html">User's Manual</a></li>
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/doc/api/index.html">API Reference</a></li>
+      </ul>
+   </nav>
+</div>
+<div style="margin-left:150px;margin-top:60px;">
+<h2 style="text-align:center">&#931;&#959;&#966;&#943;&#945; Build Instructions</h1>
+<div style="margin-bottom:3em;"></div>
+<p>
+To build &#931;&#959;&#966;&#943;&#945; from the source provided in the
+<a href="http://github.com/SofyaTool/SofyaForJava">SofyaForJava</a> Git repository
+you will need to obtain the JavaCC library package, which is available
+<a href="http://javacc.java.net/" target="_blank">here</a>.
+</p>
+<p>
+The package is structured to allow import into the Eclipse IDE for Java
+environment, although you may need to experiment a bit to import it.
+Once imported into Eclipse, you can then modify the project settings
+to reference the BCEL and JavaCC libraries.  As noted in the installation
+guide, the provided version of BCEL 6.0 may be used or the most recent
+BCEL version from the Apache Commons site.  We made changes to the
+BCEL 6.0 version supplied allowing it to work correctly with Java 7
+class files, but we have not determined if these changes were implemented
+in the latest BCEL version.
+</p>
+<p>
+As with most Eclipse projects, &#931;&#959;&#966;&#943;&#945; uses the
+Ant build environment, which comes standard with Eclipse.  If you build
+outside of the Eclipse environment you will need the Ant package installed
+as a command line tool which is available from Apache Commons.
+</p>
+<p>
+The provided build.xml targets are:
+<table>
+<tr><td>initProps</td><td>Sets environment and Ant properties for JavaCC</td></tr>
+<tr><td>init</td><td>Iniitalize the ant properties and build output directory</td></tr>
+<tr><td>compile</td><td>The compilation step, builds the EDL parser using JavaCC and
+the Java classes from the Sofya sources</td></tr>
+<tr><td>build</td><td>performs the compile and build-docs targets</td></tr>
+<tr><td>jar-bin</td><td>Creates the jar-file of Sofya binaries/classes</td></tr>
+<tr><td>jar</td><td>Builds the jar-files of both binary and source-code</td></tr>
+<tr><td>clean</td><td>Cleans/removes the existing Sofya class and jar files</td></tr>
+<tr><td>build-docs</td><td>Builds the API JavaDocs for the Sofya tool classes</td></tr>
+</table>
+</p>
+<p>
+If you make substatial changes to Sofya and would like to offer them
+through our repository on GitHub please request joining the project.
+We welcome anyone who wants to contribute to supporting or enhancing the
+tool kit.
+</p>
+</div>
+<hr>
+<p class="smalltext">Author: Wayne Motycka &#169; 2018 University of Nebraska - Lincoln.</p>
+<p class="smalltext">Page last updated by Wayne Motycka: 08/29/2018</p>
+</body>
+</html>
