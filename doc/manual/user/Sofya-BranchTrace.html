@@ -16,31 +16,42 @@ h3 {
 code {
   font-size: large;
 }
-header {
+.header {
+  height:50px;
+  background:#F0F0F0;
+  border:1px solid #CCC;
+  width:100%;
   position:fixed;
   top:0;
   left:0;
-  width:100%;
+}
+.listhorz {
+  list-style:none;
+}
+.lihorz {
+  display:inline;
+  margin-left:60px;
 }
 </style>
 </head>
 <body>
-<header>
+<div class="header">
   <nav>
-    <ul>
-        <li><a href="https://sofyatool.github.io/SofyaTool/index.html">Main</a></li>
-        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/installation.html">Installation</a></li>
-        <li><a href="https://sofyatool.github.io/SofyaTool/doc/manual/user/index.html">User's Manual</a></li>
-        <li><a href="https://sofyatool.github.io/SofyaTool/doc/api/index.html">API Reference</a></li>
-        <li><a href="https://sofyatool.github.io/SofyaTool/files/examples/index.html">Examples</a></li>
+    <ul class="listhorz">
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/index.html">Sofya Home</a></li>
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/doc/manual/installation.html">Installation</a></li>
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/doc/manual/user/index.html">User's Manual</a></li>
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/doc/api/index.html">API Reference</a></li>
+        <li class="lihorz"><a href="https://sofyatool.github.io/SofyaTool/files/examples/index.html">Examples</a></li>
     </ul>
   </nav>
-</header>
-<div style="margin-left:150px;">
-<h2>Branch Tracing with Sofya</h2>
+</div>
+<div style="margin-left:150px;margin-top:60px;">
+<h2>Branch Tracing with &#931;&#959;&#966;&#943;&#945;</h2>
 <p>
-Branch tracing in Sofya generates a list of covered edges in the CFG graph of
-the subject being analyzed.  The edges returned are not the edges reported in
+Branch tracing in Sofya (&#931;&#959;&#966;&#943;&#945;) generates a list of
+covered edges in the CFG graph of
+the Java subject being analyzed.  The edges returned are not the edges reported in
 the <code>sofya.viewers.CFGViewer</code> output however, but are instead an
 internally represented edge-id specific
 to the true/false paths (for -I <em>if</em> type branch coverage) that are
@@ -56,6 +67,7 @@ The best way to explain this difference in edge identifiers is by an example
 with a sample test program, Test.java.  The source for Test.java is as follows:
 </p>
 <pre style="border:solid;border-width:1px">
+<code>
 public class Test {
     public static void main(String[] args) {
         Test test=new Test();
@@ -78,6 +90,7 @@ public class Test {
       return null;
     }
 }
+</code>
 </pre>
 <div style="font-size:10pt"><b>Listing 1: Test.java</b></div>
 <p>
