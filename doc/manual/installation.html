@@ -40,7 +40,7 @@ UL.dblspaced>LI {
       </ul>
    </nav>
 </div>
-<div style="margin-left:150px;margin-top:60px;">
+<div style="margin-left:150px;margin-top:60px;margin-right:150px;">
 <h1 style="text-align:center">&#931;&#959;&#966;&#943;&#945; Installation Instructions</h1>
 <div style="margin-bottom:3em;"></div>
 <p>Use of &#931;&#959;&#966;&#943;&#945; (Sofya) is governed by the
@@ -82,17 +82,15 @@ software required the BCEL version 5.2 library
 The latest version (2.1.7) of &#931;&#959;&#966;&#943;&#945; uses BCEL
 6.0 which is included within the  &#931;&#959;&#966;&#943;&#945; package,
 or the jar can be downloaded <a href="../../files/bcel-6.0.jar">here</a>.
-You may also try using the latest version of BCEL (6.2) from the
+You may also try using the latest version of BCEL (6.6) from the
 official <a href="https://commons.apache.org/proper/commons-bcel/download_bcel.cgi">
-site</a>.  We have not tried building/experimenting with
-&#931;&#959;&#966;&#943;&#945; 
+site</a>.  BCEL 6.6 offers compatibility with Java 8.
+We have not tried building/experimenting with &#931;&#959;&#966;&#943;&#945; 
 using this latest BCEL version so feel free to do so.  We also welcome
 anyone wishing to update the tool to accommodate Java 8 and beyond.
 The text-based output format provided by 
 &#931;&#959;&#966;&#943;&#945; 
-makes it useful for automated analysis and graph generation, thus
-making it compatible with current and future versions of Java would
-be a welcome addition.
+makes it useful for automated analysis and graph generation.
 Installation instructions for BCEL are provided <a href="#2">below</a>.
 </p>
 <p>Do the following to install &#931;&#959;&#966;&#943;&#945;.</p>
@@ -143,8 +141,12 @@ follow these steps:</p>
       <p><code>setenv CLASSPATH &quot;${CLASSPATH}&quot;:${HOME}/bcel-5.2/bcel-5.2.jar</code></p>
       If you instead downloaded the BCEL 6.0 jar, you would put it on your
       Java classpath, replacing the ${HOME}/bcel-5.2/bcel-5.2.jar portion
-      with the path to where you placed the BCEL 6.0 jar.
+      with the path to where you placed the BCEL 6.0 jar, e.g. ${HOME}/bcel-6.0/bcel-6.0.jar.
       You may prefer to add this to your classpath in your shell's startup script.</li>
+  <li>
+   If you choose to use the latest BCEL with Java 8 support, download and extract the library in the same way
+   specifying the latest BCEL library's directory and jarfile name, e.g. ${HOME}/bcel-6.6.1/bcel-6.6.1.jar.
+  </li>
 </ol>
 </p>
 </div>
